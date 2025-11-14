@@ -16,6 +16,7 @@ import '../constants/enums.dart';
 class CalculatorProvider extends ChangeNotifier {
   CalculatorProvider() {
     _loadSavedParameters();
+    _loadDefaultSettings();
   }
 
   // Form state
@@ -289,5 +290,52 @@ class CalculatorProvider extends ChangeNotifier {
   /// Get validation hint for a specific field
   String? getValidationHint(String fieldName) {
     return ValidationService.validationHints[fieldName];
+  }
+
+  /// Save current recipe settings as default
+  Future<void> saveAsDefault() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('default_diameter', _diameterInput);
+      await prefs.setString('default_thickness', _thicknessInput);
+      await prefs.setString('default_proving_time', _provingTimeInput);
+      await prefs.setString('default_number_of_pizzas', _numberOfPizzasInput);
+      debugPrint('Default recipe settings saved');
+    } catch (e) {
+      debugPrint('Failed to save default settings: $e');
+      rethrow;
+    }
+  }
+
+  /// Load default recipe settings and apply them
+  Future<void> _loadDefaultSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final defaultDiameter = prefs.getString('default_diameter');
+      final defaultThickness = prefs.getString('default_thickness');
+      final defaultProvingTime = prefs.getString('default_proving_time');
+      final defaultNumberOfPizzas = prefs.getString('default_number_of_pizzas');
+
+      if (defaultDiameter != null) {
+        _diameterInput = defaultDiameter;
+        updateDiameter(defaultDiameter);
+      }
+      if (defaultThickness != null) {
+        _thicknessInput = defaultThickness;
+        updateThickness(defaultThickness);
+      }
+      if (defaultProvingTime != null) {
+        _provingTimeInput = defaultProvingTime;
+        updateProvingTime(defaultProvingTime);
+      }
+      if (defaultNumberOfPizzas != null) {
+        _numberOfPizzasInput = defaultNumberOfPizzas;
+        updateNumberOfPizzas(defaultNumberOfPizzas);
+      }
+
+      debugPrint('Default recipe settings loaded');
+    } catch (e) {
+      debugPrint('Failed to load default settings: $e');
+    }
   }
 }

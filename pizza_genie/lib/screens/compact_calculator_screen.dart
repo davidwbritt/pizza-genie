@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/calculator_provider.dart';
@@ -491,6 +492,14 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                     Navigator.pushNamed(context, '/privacy');
                   },
                 ),
+                const Divider(),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.exit_to_app,
+                  title: 'Close App',
+                  subtitle: 'Exit Pizza Genie',
+                  onTap: () => _showCloseAppConfirmation(context),
+                ),
               ],
             ),
           ),
@@ -580,6 +589,39 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
           left: 16,
           right: 16,
         ),
+      ),
+    );
+  }
+
+  /// Show confirmation dialog before closing the app
+  void _showCloseAppConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.exit_to_app, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Close Pizza Genie?'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to exit the app?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context); // Close drawer
+              SystemNavigator.pop(); // Close app
+            },
+            child: const Text('Exit'),
+          ),
+        ],
       ),
     );
   }
