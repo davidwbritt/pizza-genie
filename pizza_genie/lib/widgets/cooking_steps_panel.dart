@@ -19,6 +19,29 @@ class CookingStepsPanel extends StatefulWidget {
 
 class _CookingStepsPanelState extends State<CookingStepsPanel> {
   int _currentStep = 0;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Auto-scroll to current step
+  void _scrollToCurrentStep() {
+    if (_scrollController.hasClients) {
+      // Calculate approximate position of current step
+      // Each step item is approximately 88px (16px padding + 56px content + 16px margin)
+      const double itemHeight = 88.0;
+      final double targetPosition = _currentStep * itemHeight;
+      
+      _scrollController.animateTo(
+        targetPosition,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,6 +258,7 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
   /// Build steps list with progress tracking
   Widget _buildStepsList(BuildContext context, List<String> steps) {
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(AppConstants.defaultPadding),
       itemCount: steps.length,
       itemBuilder: (context, index) {
@@ -246,6 +270,9 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
           onTap: () {
             setState(() {
               _currentStep = index;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToCurrentStep();
             });
           },
           child: Container(
@@ -389,6 +416,9 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
                 setState(() {
                   _currentStep--;
                 });
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToCurrentStep();
+                });
               } : null,
               icon: const Icon(Icons.arrow_back, size: 18),
               label: const Text('Previous'),
@@ -411,6 +441,9 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
               onPressed: _currentStep < steps.length - 1 ? () {
                 setState(() {
                   _currentStep++;
+                });
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToCurrentStep();
                 });
               } : () {
                 // All steps completed

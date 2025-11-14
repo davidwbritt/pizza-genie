@@ -133,9 +133,10 @@ class MainScreen extends StatelessWidget {
             ),
             SizedBox(height: 24),
             Text(
-              'Pizza Genie',
+              'Clevermonkey\nPizza Genie',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),

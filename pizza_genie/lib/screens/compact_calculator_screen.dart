@@ -33,7 +33,17 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.appName),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: AssetImage('assets/images/clevermonkey.jpg'),
+            ),
+            const SizedBox(width: 8),
+            const Text(AppConstants.appShortName),
+          ],
+        ),
         centerTitle: true,
         actions: [
           IconButton(

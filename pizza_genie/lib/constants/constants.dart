@@ -1,11 +1,12 @@
-/// Pizza Genie Application Constants
+/// Clevermonkey Pizza Genie Application Constants
 /// 
 /// This file contains app-wide constants as required by the implementation plan.
 
 class AppConstants {
   // App Information
-  static const String appName = 'Pizza Genie';
-  static const String appDescription = 'A dough calculator for home pizza chefs';
+  static const String appName = 'Clevermonkey Pizza Genie';
+  static const String appShortName = 'Pizza Genie';
+  static const String appDescription = 'A smart dough calculator for home pizza chefs';
   
   // Pizza Diameter Options (inches)
   static const List<double> allowedDiameters = [10.0, 12.0, 14.0, 16.0];
