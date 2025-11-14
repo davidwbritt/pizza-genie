@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "We are to create a mobile application called 'pizza-genie' that will provide tools for the home pizza chef. As a beginning, we will create a dough calculator that will help to guide the home chef toward creating dough to support different styles of pizza. We want to have a main page, a settings page (where we will support both a light and a dark theme); we will have an about page, and a privacy policy page. Please create the framework of our application."
 
+## Clarifications
+
+### Session 2024-11-14
+
+- Q: How should crust thickness be defined and controlled? → A: 5-point scale where 1=very thin, 2=NY style, 3=Neapolitan, 4=Grandma, 5=Sicilian
+- Q: How should proving time input be handled? → A: Hours-based input (whole numbers) with contextual text messages updating to guide yeast quantity and flavor development
+- Q: What input validation rules should be applied? → A: Strict limits: 1-48 hours proving time, diameter must be from list (10,12,14,16), thickness scale 1-5 only
+- Q: What measurement units system should be used? → A: Dual display: Always show both metric (grams for flour, ml for water) and imperial side-by-side to support both scale and no-scale home chefs
+- Q: What calculation algorithm source should be used? → A: Style-specific formulas based on established culinary principles without using proprietary recipes, allowing variance by pizza style
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Calculate Pizza Dough Recipe (Priority: P1)
@@ -57,7 +67,7 @@ A user wants to learn more about the Pizza Genie app, understand its privacy pol
 
 ### Edge Cases
 
-- What happens when user enters invalid or extreme values in the dough calculator (negative numbers, extremely large quantities)?
+- What happens when user enters values outside strict limits (proving time <1 or >48 hours, invalid diameter, thickness outside 1-5 scale)?
 - How does the app handle theme switching while actively using the dough calculator?
 - What happens when the app is force-closed during recipe calculation and reopened?
 
@@ -66,16 +76,16 @@ A user wants to learn more about the Pizza Genie app, understand its privacy pol
 ### Functional Requirements
 
 - **FR-001**: System MUST provide a dough calculator that accepts pizza diameter selection (10, 12, 14, 16 inches)
-- **FR-002**: System MUST allow user to adjust crust thickness settings in the calculator
-- **FR-003**: System MUST allow user to specify dough proving time in the calculator
-- **FR-004**: System MUST calculate ingredient quantities for flour, water, salt, yeast, sugar, and olive oil based on user inputs
+- **FR-002**: System MUST allow user to select crust thickness on a 5-point scale (1=very thin, 2=NY style, 3=Neapolitan, 4=Grandma, 5=Sicilian)
+- **FR-003**: System MUST allow user to specify dough proving time in whole hours with contextual guidance messages about yeast quantity and flavor development
+- **FR-004**: System MUST calculate ingredient quantities for flour, water, salt, yeast, sugar, and olive oil using style-specific formulas that vary based on pizza type without using proprietary recipes
 - **FR-005**: Users MUST be able to access a main navigation interface to reach all app sections
 - **FR-006**: System MUST provide a settings interface where users can select between light and dark visual themes
 - **FR-007**: System MUST persist user theme preference between app sessions
 - **FR-008**: System MUST provide an about page displaying app information and details
 - **FR-009**: System MUST provide access to privacy policy information
-- **FR-010**: System MUST display ingredient measurements in user-friendly kitchen units
-- **FR-011**: System MUST validate user input in the dough calculator and handle invalid entries gracefully
+- **FR-010**: System MUST display ingredient measurements in dual format showing both metric (grams for flour, ml for water) and imperial (cups, teaspoons) side-by-side
+- **FR-011**: System MUST validate user input with strict limits (1-48 hours proving time, diameter from preset list only, thickness scale 1-5) and reject invalid entries with clear error messages
 - **FR-012**: System MUST maintain consistent visual appearance across all screens when theme is applied
 
 ### Key Entities
@@ -99,10 +109,10 @@ A user wants to learn more about the Pizza Genie app, understand its privacy pol
 
 ## Assumptions
 
-- Standard kitchen measurements (grams, cups, teaspoons, tablespoons) are acceptable for ingredient quantities
+- Dual measurement display (metric: grams for flour/ml for water, imperial: cups/teaspoons) supports both scale-equipped and traditional home chefs
 - Four pizza diameter options (10, 12, 14, 16 inches) cover the most common home pizza sizes
-- Crust thickness can be represented as adjustable levels (thin, medium, thick) rather than precise measurements
-- Proving time can be input in hours and will affect yeast calculations accordingly
+- Crust thickness is represented as a 5-point scale with named pizza styles (1=very thin, 2=NY style, 3=Neapolitan, 4=Grandma, 5=Sicilian)
+- Proving time is input in whole hours and affects yeast calculations with contextual guidance for flavor development vs. quick preparation
 - Light and dark themes cover the primary visual accessibility needs for most users
 - Users will primarily use the app during active pizza preparation sessions
 - App will be distributed through standard mobile app stores requiring standard compliance information
