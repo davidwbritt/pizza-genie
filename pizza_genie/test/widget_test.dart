@@ -11,19 +11,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pizza_genie/main.dart';
 
 void main() {
-  testWidgets('Pizza Genie app loads correctly', (WidgetTester tester) async {
+  testWidgets('Pizza Genie compact app loads correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const PizzaGenieApp());
 
     // Verify that our app shows the Pizza Genie title
     expect(find.text('Pizza Genie'), findsWidgets);
-    expect(find.text('Welcome to Pizza Genie!'), findsOneWidget);
-
-    // Verify pizza icons are present (multiple icons expected)
+    
+    // Verify the compact interface elements are present
+    expect(find.text('Pizza Size'), findsOneWidget);
+    expect(find.text('Crust Style'), findsOneWidget);
+    expect(find.text('Proving Time'), findsOneWidget);
+    expect(find.text('Quantity'), findsOneWidget);
+    
+    // Verify pizza icons are present
     expect(find.byIcon(Icons.local_pizza), findsWidgets);
     
-    // Verify key form elements are present
-    expect(find.text('Pizza Diameter (inches)'), findsOneWidget);
-    expect(find.text('Crust Thickness'), findsOneWidget);
+    // Verify key UI components
+    expect(find.text('Calculate'), findsOneWidget);
   });
 }

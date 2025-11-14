@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'constants/constants.dart';
 import 'providers/calculator_provider.dart';
-import 'screens/calculator_screen.dart';
+import 'screens/compact_calculator_screen.dart';
 
 void main() {
   runApp(const PizzaGenieApp());
@@ -23,7 +23,7 @@ class PizzaGenieApp extends StatelessWidget {
         theme: _lightTheme,
         darkTheme: _darkTheme,
         themeMode: ThemeMode.system, // Will be controlled by ThemeProvider later
-        home: const CalculatorScreen(),
+        home: const CompactCalculatorScreen(),
         routes: _routes,
         debugShowCheckedModeBanner: false,
       ),

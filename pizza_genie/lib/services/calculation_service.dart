@@ -126,36 +126,50 @@ class CalculationService {
   /// Get preparation steps for the calculated recipe
   ///
   /// Returns a list of step descriptions for making the dough
-  /// based on the proving time and technique.
+  /// with proper mixing order: water+sugar+yeast → foam → flour → salt → oil
   static List<String> getPreparationSteps(CalculatorParameters parameters) {
     final bool isLongProve = parameters.provingTimeHours.hours >= 12;
+    final bool isQuickProve = parameters.provingTimeHours.hours <= 4;
     
     final List<String> steps = [
-      'Measure all ingredients using a kitchen scale',
-      'Mix flour and salt in a large bowl',
-      'Dissolve yeast and sugar in lukewarm water (100-110°F)',
-      'Add water mixture and oil to flour',
-      'Mix until a shaggy dough forms',
-      'Knead for 8-10 minutes until smooth and elastic',
+      'Measure all ingredients using a kitchen scale for accuracy',
+      'Mix lukewarm water (100-110°F), sugar, and yeast in a small bowl',
+      'Let mixture sit for 5 minutes until foamy (proves yeast is active)',
+      'Place flour in large mixing bowl and create a well in center',
+      'Pour foamy yeast mixture into flour well and mix gently',
+      'Add salt around edges (keep away from yeast initially) and mix',
+      'Mix until shaggy dough forms, then add olive oil',
+      'Knead for 8-10 minutes until smooth, elastic, and slightly tacky',
     ];
 
     if (isLongProve) {
       steps.addAll([
-        'Shape into a ball and place in oiled container',
-        'Cover and refrigerate for ${parameters.provingTimeHours.hours} hours',
-        'Remove from fridge 30 minutes before shaping',
+        'Shape into a smooth ball and place in lightly oiled container',
+        'Cover tightly and refrigerate for ${parameters.provingTimeHours.hours} hours',
+        'Remove from fridge 30-60 minutes before shaping to come to room temperature',
+        'Dough will develop complex flavors during slow fermentation',
+      ]);
+    } else if (isQuickProve) {
+      steps.addAll([
+        'Shape into a ball and place in oiled bowl',
+        'Cover and let rise in warm place (75-80°F) for ${parameters.provingTimeHours.hours} hour${parameters.provingTimeHours.hours > 1 ? 's' : ''}',
+        'Dough is ready when doubled in size (use poke test)',
       ]);
     } else {
       steps.addAll([
         'Shape into a ball and place in oiled bowl',
-        'Cover and let rise in warm place for ${parameters.provingTimeHours.hours} hour${parameters.provingTimeHours.hours > 1 ? 's' : ''}',
-        'Dough is ready when doubled in size',
+        'Cover and let rise at room temperature for ${parameters.provingTimeHours.hours} hours',
+        'For best flavor, refrigerate after 2 hours of room temperature rise',
+        'Dough is ready when doubled and feels light and airy',
       ]);
     }
 
     steps.addAll([
-      'Divide into ${parameters.numberOfPizzas} portion${parameters.numberOfPizzas > 1 ? 's' : ''}',
-      'Shape into pizza bases and add toppings',
+      'Divide into ${parameters.numberOfPizzas} portion${parameters.numberOfPizzas > 1 ? 's' : ''} using a bench scraper',
+      'Let portioned dough rest 15-30 minutes before shaping',
+      'Gently stretch from center outward, preserving air bubbles',
+      'Add sauce, leaving 1-inch border for crust',
+      'Bake on preheated pizza stone at highest oven temperature (500-550°F)',
     ]);
 
     return steps;
