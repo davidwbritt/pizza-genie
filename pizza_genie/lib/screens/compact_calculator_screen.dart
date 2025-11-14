@@ -293,16 +293,64 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Build new recipe button
   Widget _buildNewRecipeButton(CalculatorProvider provider) {
     return ElevatedButton.icon(
-      onPressed: () {
-        provider.resetForm();
-        _pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      },
+      onPressed: () => _showNewRecipeConfirmation(provider),
       icon: const Icon(Icons.refresh),
       label: const Text('New Recipe'),
+    );
+  }
+
+  /// Show confirmation dialog before resetting recipe
+  void _showNewRecipeConfirmation(CalculatorProvider provider) {
+    // Only show confirmation if user has made selections or has a calculated recipe
+    final hasContent = provider.showResults || 
+        provider.diameterInput != AppConstants.defaultDiameter.toString() ||
+        provider.thicknessInput != AppConstants.defaultThicknessLevel.toString() ||
+        provider.provingTimeInput != AppConstants.defaultProvingTimeHours.toString() ||
+        provider.numberOfPizzasInput != AppConstants.defaultNumberOfPizzas.toString();
+
+    if (!hasContent) {
+      // No content to lose, just reset directly
+      _resetToNewRecipe(provider);
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Start New Recipe?'),
+          ],
+        ),
+        content: const Text(
+          'This will clear your current recipe and selections. Are you sure you want to continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _resetToNewRecipe(provider);
+            },
+            child: const Text('Start New'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Reset form and navigate to first page
+  void _resetToNewRecipe(CalculatorProvider provider) {
+    provider.resetForm();
+    _pageController.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 }

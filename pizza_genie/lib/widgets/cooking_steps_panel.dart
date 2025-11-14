@@ -452,12 +452,14 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Reset to step 0 for next time
+              // Reset form and step for new recipe
+              final provider = Provider.of<CalculatorProvider>(context, listen: false);
+              provider.resetForm();
               setState(() {
                 _currentStep = 0;
               });
             },
-            child: const Text('Start New Recipe'),
+            child: const Text('New Recipe'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context),
