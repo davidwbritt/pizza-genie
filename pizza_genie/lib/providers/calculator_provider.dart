@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/calculator_parameters.dart';
@@ -15,8 +16,7 @@ import '../constants/enums.dart';
 /// calculations, and persistence using SharedPreferences.
 class CalculatorProvider extends ChangeNotifier {
   CalculatorProvider() {
-    _loadSavedParameters();
-    _loadDefaultSettings();
+    _loadSavedData();
   }
 
   // Form state
@@ -316,26 +316,47 @@ class CalculatorProvider extends ChangeNotifier {
       final defaultProvingTime = prefs.getString('default_proving_time');
       final defaultNumberOfPizzas = prefs.getString('default_number_of_pizzas');
 
+      bool hasDefaults = false;
+
       if (defaultDiameter != null) {
         _diameterInput = defaultDiameter;
-        updateDiameter(defaultDiameter);
+        hasDefaults = true;
       }
       if (defaultThickness != null) {
         _thicknessInput = defaultThickness;
-        updateThickness(defaultThickness);
+        hasDefaults = true;
       }
       if (defaultProvingTime != null) {
         _provingTimeInput = defaultProvingTime;
-        updateProvingTime(defaultProvingTime);
+        hasDefaults = true;
       }
       if (defaultNumberOfPizzas != null) {
         _numberOfPizzasInput = defaultNumberOfPizzas;
-        updateNumberOfPizzas(defaultNumberOfPizzas);
+        hasDefaults = true;
       }
 
-      debugPrint('Default recipe settings loaded');
+      if (hasDefaults) {
+        // Clear any validation errors and recalculate
+        _validationErrors.clear();
+        
+        // Trigger auto-calculation if all inputs are valid
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!hasValidationErrors) {
+            calculateRecipe();
+          }
+          notifyListeners();
+        });
+        
+        debugPrint('Default recipe settings loaded: D=$defaultDiameter, T=$defaultThickness, P=$defaultProvingTime, N=$defaultNumberOfPizzas');
+      }
     } catch (e) {
       debugPrint('Failed to load default settings: $e');
     }
+  }
+
+  /// Load saved data - first saved parameters, then defaults (which override if present)
+  Future<void> _loadSavedData() async {
+    await _loadSavedParameters();
+    await _loadDefaultSettings();
   }
 }
