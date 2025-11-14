@@ -137,7 +137,17 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ),
                       
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
+                      
+                      // Version
+                      Text(
+                        'Version 1.0.0',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
                       
                       // Loading indicator
                       SizedBox(
