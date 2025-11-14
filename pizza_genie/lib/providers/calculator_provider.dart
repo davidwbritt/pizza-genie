@@ -28,6 +28,8 @@ class CalculatorProvider extends ChangeNotifier {
   bool _showResults = false;
   Map<String, String> _validationErrors = {};
   List<String> _calculationWarnings = [];
+  MeasurementSystem _measurementSystem = MeasurementSystem.metric;
+  bool _keepAwake = true; // Default to on for cooking convenience
 
   // Form field controllers - these would be managed by form widgets
   String _diameterInput = AppConstants.defaultDiameter.toString();
@@ -44,6 +46,8 @@ class CalculatorProvider extends ChangeNotifier {
   bool get hasValidationErrors => _validationErrors.isNotEmpty;
   Map<String, String> get validationErrors => Map.from(_validationErrors);
   List<String> get calculationWarnings => List.from(_calculationWarnings);
+  MeasurementSystem get measurementSystem => _measurementSystem;
+  bool get keepAwake => _keepAwake;
   
   // Form input getters
   String get diameterInput => _diameterInput;
@@ -76,6 +80,20 @@ class CalculatorProvider extends ChangeNotifier {
   void updateNumberOfPizzas(String value) {
     _numberOfPizzasInput = value;
     _validateField('numberOfPizzas', value);
+    notifyListeners();
+  }
+
+  /// Toggle between metric and imperial measurement systems
+  void toggleMeasurementSystem() {
+    _measurementSystem = _measurementSystem == MeasurementSystem.metric 
+      ? MeasurementSystem.imperial 
+      : MeasurementSystem.metric;
+    notifyListeners();
+  }
+
+  /// Toggle keep awake functionality
+  void toggleKeepAwake() {
+    _keepAwake = !_keepAwake;
     notifyListeners();
   }
 
@@ -176,6 +194,7 @@ class CalculatorProvider extends ChangeNotifier {
     _showResults = false;
     _validationErrors.clear();
     _calculationWarnings.clear();
+    _keepAwake = true; // Keep default to on
     
     _diameterInput = AppConstants.defaultDiameter.toString();
     _thicknessInput = AppConstants.defaultThicknessLevel.toString();

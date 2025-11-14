@@ -22,12 +22,12 @@ void main() {
     expect(find.text('Pizza Size'), findsOneWidget);
     expect(find.text('Crust Style'), findsOneWidget);
     expect(find.text('Proving Time'), findsOneWidget);
-    expect(find.text('Quantity'), findsOneWidget);
+    expect(find.text('Keep awake'), findsOneWidget);
     
-    // Verify pizza icons are present
-    expect(find.byIcon(Icons.local_pizza), findsWidgets);
+    // Verify interface icons are present
+    expect(find.byIcon(Icons.straighten), findsOneWidget); // Pizza size icon
     
     // Verify key UI components
-    expect(find.text('Calculate'), findsOneWidget);
+    expect(find.text('Your Recipe'), findsOneWidget);
   });
 }

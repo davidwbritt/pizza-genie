@@ -185,9 +185,9 @@ class CompactResultsPanel extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
-              childAspectRatio: 2.8,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+              childAspectRatio: 2.4, // Reduced from 2.8 to give more height
+              crossAxisSpacing: 6,    // Reduced spacing
+              mainAxisSpacing: 6,     // Reduced spacing
               children: provider.currentMeasurements.map((measurement) {
                 return _buildIngredientTile(context, measurement);
               }).toList(),
@@ -201,10 +201,10 @@ class CompactResultsPanel extends StatelessWidget {
   /// Build individual ingredient tile
   Widget _buildIngredientTile(BuildContext context, IngredientMeasurement measurement) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6), // Reduced padding
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6), // Smaller radius
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
@@ -212,45 +212,60 @@ class CompactResultsPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min, // Prevent overflow
         children: [
-          Row(
-            children: [
-              Text(
-                _getIngredientEmoji(measurement.ingredientType),
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  measurement.ingredientType.displayName,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+          // Header with emoji and name
+          Flexible(
+            child: Row(
+              children: [
+                Text(
+                  _getIngredientEmoji(measurement.ingredientType),
+                  style: const TextStyle(fontSize: 14), // Smaller emoji
                 ),
-              ),
-            ],
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    measurement.ingredientType.displayName,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11, // Smaller text
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
           ),
           
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                measurement.metricDisplay,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
+          const SizedBox(height: 4),
+          
+          // Measurements
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  measurement.metricDisplay,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                measurement.imperialDisplay,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                Text(
+                  measurement.imperialDisplay,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 10, // Smaller imperial text
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

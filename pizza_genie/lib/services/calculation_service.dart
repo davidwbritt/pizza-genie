@@ -112,15 +112,19 @@ class CalculationService {
   /// Estimate total preparation and proving time
   ///
   /// Returns estimated total time in minutes including mixing,
-  /// kneading, and proving based on the proving time selected.
+  /// kneading, and proving. Proving time is concurrent regardless of pizza count.
   static int estimateTotalTimeMinutes(CalculatorParameters parameters) {
     const int mixingTimeMinutes = 15;
     const int kneadingTimeMinutes = 10;
     const int shapingTimeMinutes = 5;
     
+    // Proving time is the same regardless of number of pizzas (concurrent)
     final int provingTimeMinutes = parameters.provingTimeHours.hours * 60;
     
-    return mixingTimeMinutes + kneadingTimeMinutes + shapingTimeMinutes + provingTimeMinutes;
+    // Only shaping time increases with pizza count
+    final int totalShapingTime = shapingTimeMinutes * parameters.numberOfPizzas;
+    
+    return mixingTimeMinutes + kneadingTimeMinutes + totalShapingTime + provingTimeMinutes;
   }
 
   /// Get preparation steps for the calculated recipe

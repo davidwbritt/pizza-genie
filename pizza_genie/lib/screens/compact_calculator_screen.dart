@@ -6,6 +6,7 @@ import '../constants/constants.dart';
 import '../constants/enums.dart';
 import '../widgets/compact_input_panel.dart';
 import '../widgets/compact_results_panel.dart';
+import '../widgets/cooking_steps_panel.dart';
 
 /// Compact calculator screen with horizontal swipe navigation
 ///
@@ -58,14 +59,14 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                     });
                   },
                   children: [
-                    // Page 1: Input Controls
+                    // Page 1: Setup with Live Recipe
                     const CompactInputPanel(),
                     
-                    // Page 2: Results (only if calculated)
+                    // Page 2: Cooking Steps (only if recipe is available)
                     if (provider.showResults)
-                      const CompactResultsPanel()
+                      const CookingStepsPanel()
                     else
-                      _buildCalculatePrompt(provider),
+                      _buildCookingPrompt(provider),
                   ],
                 ),
               ),
@@ -126,16 +127,16 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   String _getPageLabel() {
     switch (_currentPage) {
       case 0:
-        return 'Setup';
+        return 'Setup & Recipe';
       case 1:
-        return 'Recipe';
+        return 'Cooking Steps';
       default:
         return '';
     }
   }
 
-  /// Build calculate prompt when no results available
-  Widget _buildCalculatePrompt(CalculatorProvider provider) {
+  /// Build cooking prompt when no results available
+  Widget _buildCookingPrompt(CalculatorProvider provider) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.defaultPadding * 2),
@@ -150,7 +151,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             const SizedBox(height: 16),
             
             Text(
-              'Swipe left to configure your pizza',
+              'Configure your pizza to see cooking steps',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -159,7 +160,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             const SizedBox(height: 8),
             
             Text(
-              'Then tap Calculate to see your recipe',
+              'Swipe left to setup your pizza',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -187,7 +188,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       child: SafeArea(
         child: Row(
           children: [
-            // Navigation hints
+            // Navigation hints and buttons
             if (_currentPage == 0) ...[
               Expanded(
                 child: Row(
@@ -199,7 +200,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      provider.showResults ? 'Swipe to see recipe' : 'Configure your pizza',
+                      provider.showResults ? 'Swipe right for cooking steps' : 'Recipe updates as you configure',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -207,8 +208,25 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                   ],
                 ),
               ),
+              
+              // Quick navigate to steps button when recipe ready
+              if (provider.showResults)
+                ElevatedButton.icon(
+                  onPressed: () {
+                    _pageController.animateToPage(
+                      1,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_forward, size: 18),
+                  label: const Text('Start Cooking'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                ),
             ] else ...[
-              // Back to input button
+              // Back to setup button
               TextButton.icon(
                 onPressed: () {
                   _pageController.animateToPage(
@@ -218,16 +236,12 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                   );
                 },
                 icon: const Icon(Icons.edit),
-                label: const Text('Edit'),
+                label: const Text('Edit Recipe'),
               ),
               const Spacer(),
-            ],
-            
-            // Main action button
-            if (_currentPage == 0)
-              _buildCalculateButton(provider)
-            else
+              
               _buildNewRecipeButton(provider),
+            ],
           ],
         ),
       ),
@@ -272,7 +286,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             height: 20,
             child: CircularProgressIndicator(strokeWidth: 2),
           )
-        : const Text('Calculate'),
+        : const Text('Recipe >'),
     );
   }
 

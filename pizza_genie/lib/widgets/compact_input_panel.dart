@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/calculator_provider.dart';
 import '../constants/constants.dart';
 import '../constants/enums.dart';
+import '../models/ingredient_measurement.dart';
 
 /// Compact input panel with sliders, steppers and touch controls
 ///
@@ -23,22 +24,22 @@ class CompactInputPanel extends StatelessWidget {
             children: [
               // Pizza diameter selector
               _buildDiameterSelector(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding * 1.5),
+              const SizedBox(height: AppConstants.defaultPadding),
               
               // Thickness selector with visual preview
               _buildThicknessSelector(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding * 1.5),
+              const SizedBox(height: AppConstants.defaultPadding),
               
               // Proving time with slider
               _buildProvingTimeSlider(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding * 1.5),
-              
-              // Number of pizzas stepper
-              _buildPizzaCountStepper(context, provider),
               const SizedBox(height: AppConstants.defaultPadding),
               
-              // Quick presets
-              _buildQuickPresets(context, provider),
+              // Quick presets (temporarily hidden)
+              // _buildQuickPresets(context, provider),
+              // const SizedBox(height: AppConstants.defaultPadding * 1.5),
+              
+              // Live ingredients preview
+              _buildLiveIngredientsPreview(context, provider),
               
               // Validation errors
               if (provider.hasValidationErrors)
@@ -81,7 +82,7 @@ class CompactInputPanel extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         
         // Visual diameter selector
         Row(
@@ -141,13 +142,13 @@ class CompactInputPanel extends StatelessWidget {
   }
 
   double _getDiameterDisplaySize(double diameter) {
-    // Map diameter to display size (30-60px range)
+    // Map diameter to display size (28-50px range) - more compact
     switch (diameter) {
-      case 10.0: return 35;
-      case 12.0: return 42;
-      case 14.0: return 49;
-      case 16.0: return 56;
-      default: return 42;
+      case 10.0: return 30;
+      case 12.0: return 36;
+      case 14.0: return 42;
+      case 16.0: return 48;
+      default: return 36;
     }
   }
 
@@ -192,7 +193,7 @@ class CompactInputPanel extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         
         // Visual thickness selector
         Row(
@@ -253,17 +254,17 @@ class CompactInputPanel extends StatelessWidget {
   }
 
   double _getThicknessBarHeight(int level) {
-    // Map thickness level to bar height (12-36px range)
-    return 12.0 + (level * 4.8);
+    // Map thickness level to bar height (8-28px range) - more compact
+    return 8.0 + (level * 4.0);
   }
 
   String _getShortStyleName(ThicknessLevel thickness) {
     switch (thickness) {
-      case ThicknessLevel.veryThin: return 'Thin';
-      case ThicknessLevel.nyStyle: return 'NY';
-      case ThicknessLevel.neapolitan: return 'Neap';
-      case ThicknessLevel.grandma: return 'Grand';
-      case ThicknessLevel.sicilian: return 'Sici';
+      case ThicknessLevel.veryThin: return 'Very Thin';
+      case ThicknessLevel.nyStyle: return 'NY Style';
+      case ThicknessLevel.neapolitan: return 'Neapolitan';
+      case ThicknessLevel.grandma: return 'Grandma';
+      case ThicknessLevel.sicilian: return 'Sicilian';
     }
   }
 
@@ -306,7 +307,7 @@ class CompactInputPanel extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         
         // Proving time slider
         SliderTheme(
@@ -316,9 +317,9 @@ class CompactInputPanel extends StatelessWidget {
           ),
           child: Slider(
             value: currentTime.toDouble(),
-            min: 1,
+            min: 2,
             max: 48,
-            divisions: 47,
+            divisions: 46,
             label: '${currentTime}h',
             onChanged: (value) {
               provider.updateProvingTime(value.round().toString());
@@ -330,7 +331,7 @@ class CompactInputPanel extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTimeMarker(context, '1h\nQuick'),
+            _buildTimeMarker(context, '2h\nQuick'),
             _buildTimeMarker(context, '8h\nSame day'),
             _buildTimeMarker(context, '24h\nOvernight'),
             _buildTimeMarker(context, '48h\nSlow'),
@@ -356,6 +357,132 @@ class CompactInputPanel extends StatelessWidget {
     if (hours <= 12) return 'Balanced fermentation - good flavor development';
     if (hours <= 24) return 'Overnight prove - excellent flavor and texture';
     return 'Slow fermentation - maximum flavor and digestibility';
+  }
+
+  /// Build subtle keep awake toggle for bottom of ingredients box
+  Widget _buildSubtleKeepAwakeToggle(BuildContext context, CalculatorProvider provider) {
+    return InkWell(
+      onTap: () {
+        provider.toggleKeepAwake();
+        _showKeepAwakeFeedback(context, provider.keepAwake);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
+              color: provider.keepAwake 
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+                : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              size: 14,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Keep awake',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: provider.keepAwake 
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                  : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showKeepAwakeFeedback(BuildContext context, bool keepAwake) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          keepAwake 
+            ? 'Screen will stay awake during cooking'
+            : 'Screen will dim normally',
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          bottom: 100,
+          left: 16,
+          right: 16,
+        ),
+      ),
+    );
+  }
+
+  /// Build compact quantity control for ingredients header
+  Widget _buildCompactQuantityControl(BuildContext context, CalculatorProvider provider) {
+    final currentCount = int.tryParse(provider.numberOfPizzasInput) ?? 1;
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Decrease button
+        GestureDetector(
+          onTap: currentCount > 1 ? () {
+            provider.updateNumberOfPizzas((currentCount - 1).toString());
+          } : null,
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: currentCount > 1 
+                ? Theme.of(context).colorScheme.primary 
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.remove,
+              size: 14,
+              color: currentCount > 1 
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        
+        const SizedBox(width: 8),
+        
+        // Quantity display
+        Text(
+          'x$currentCount',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        
+        const SizedBox(width: 8),
+        
+        // Increase button
+        GestureDetector(
+          onTap: currentCount < 10 ? () {
+            provider.updateNumberOfPizzas((currentCount + 1).toString());
+          } : null,
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: currentCount < 10 
+                ? Theme.of(context).colorScheme.primary 
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.add,
+              size: 14,
+              color: currentCount < 10 
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   /// Build pizza count stepper
@@ -510,6 +637,271 @@ class CompactInputPanel extends StatelessWidget {
     provider.updateThickness(thickness.toString());
     provider.updateProvingTime(provingTime.toString());
     provider.updateNumberOfPizzas(numberOfPizzas.toString());
+  }
+
+  /// Build live ingredients preview that updates as user changes selections
+  Widget _buildLiveIngredientsPreview(BuildContext context, CalculatorProvider provider) {
+    // Auto-calculate on every build to keep ingredients live
+    _autoCalculateIfValid(provider);
+    
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.receipt_long,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Your Recipe',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                
+                // Quantity multiplier control
+                if (provider.showResults && provider.currentRecipe != null) ...[
+                  _buildCompactQuantityControl(context, provider),
+                  const SizedBox(width: 12),
+                ],
+                
+                // Hydration display with icon
+                if (provider.showResults && provider.currentRecipe != null) ...[
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.water_drop,
+                        size: 14,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${provider.currentRecipe!.hydrationPercentage.toStringAsFixed(0)}%',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                
+                // Measurement system toggle
+                InkWell(
+                      onTap: () => provider.toggleMeasurementSystem(),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              provider.measurementSystem == MeasurementSystem.metric ? 'g/ml' : 'cups',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.swap_horiz,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            
+            // Ingredients preview
+            if (provider.showResults && provider.currentMeasurements.isNotEmpty) ...[
+              // Compact ingredients grid
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                childAspectRatio: 2.2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                children: provider.currentMeasurements.map((measurement) {
+                  return _buildCompactIngredientTile(context, measurement);
+                }).toList(),
+              ),
+              
+            ] else ...[
+              // Placeholder when no valid inputs
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    'Configure your pizza to see ingredients',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            
+            // Subtle keep awake toggle at bottom
+            const SizedBox(height: 4),
+            _buildSubtleKeepAwakeToggle(context, provider),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Auto-calculate recipe when inputs are valid (silent calculation)
+  void _autoCalculateIfValid(CalculatorProvider provider) {
+    // Only calculate if we don't have results yet or inputs changed
+    if (!provider.hasValidationErrors && !provider.isCalculating) {
+      // Silent calculation without UI feedback
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        provider.calculateRecipe();
+      });
+    }
+  }
+
+  /// Build compact ingredient tile for live preview
+  Widget _buildCompactIngredientTile(BuildContext context, IngredientMeasurement measurement) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(
+                _getIngredientEmoji(measurement.ingredientType),
+                style: const TextStyle(fontSize: 12),
+              ),
+              const SizedBox(width: 2),
+              Expanded(
+                child: Text(
+                  measurement.ingredientType.displayName,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          Consumer<CalculatorProvider>(
+            builder: (context, prov, child) {
+              final displayText = prov.measurementSystem == MeasurementSystem.metric
+                ? _roundToGram(measurement.metricDisplay)
+                : measurement.imperialDisplay;
+              
+              return Text(
+                displayText,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 11,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getIngredientEmoji(IngredientType type) {
+    switch (type) {
+      case IngredientType.flour: return '🌾';
+      case IngredientType.water: return '💧';
+      case IngredientType.salt: return '🧂';
+      case IngredientType.yeast: return '🦠';
+      case IngredientType.sugar: return '🍯';
+      case IngredientType.oil: return '🫒';
+    }
+  }
+
+  /// Round metric measurements to nearest gram for practical kitchen use
+  String _roundToGram(String metricDisplay) {
+    // Extract the number and unit from the display string
+    final regex = RegExp(r'(\d+\.?\d*)(g|ml)');
+    final match = regex.firstMatch(metricDisplay);
+    
+    if (match != null) {
+      final value = double.parse(match.group(1)!);
+      final unit = match.group(2)!;
+      final rounded = value.round();
+      return '$rounded$unit';
+    }
+    
+    return metricDisplay; // Return original if parsing fails
+  }
+
+  Widget _buildQuickStat(
+    BuildContext context,
+    String emoji,
+    String value,
+    String label,
+  ) {
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 12)),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
   }
 
   /// Build compact error display

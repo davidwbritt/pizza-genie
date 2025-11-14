@@ -39,8 +39,14 @@ class IngredientMeasurement {
 
   /// Get formatted imperial display string
   String get imperialDisplay {
-    final baseDisplay = '${_formatValue(imperialValue)} $imperialUnit';
-    return imperialNote != null ? '$imperialNote $baseDisplay' : baseDisplay;
+    if (imperialNote != null && imperialNote!.isNotEmpty) {
+      // Show only the fraction when we have a standard fraction
+      return '$imperialNote $imperialUnit';
+    } else {
+      // Fall back to decimal display for cases without fractions
+      final baseDisplay = '${_formatValue(imperialValue)} $imperialUnit';
+      return baseDisplay;
+    }
   }
 
   /// Get combined dual display string

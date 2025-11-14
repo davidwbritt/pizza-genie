@@ -17,7 +17,7 @@ class AppConstants {
   static const int maxThicknessLevel = 5;
   
   // Proving Time Range (hours)
-  static const int minProvingTimeHours = 1;
+  static const int minProvingTimeHours = 2;
   static const int maxProvingTimeHours = 48;
   
   // Default Values

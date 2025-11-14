@@ -42,21 +42,25 @@ class MeasurementConverter {
     final cups = grams / gramsPerCup;
     
     if (cups >= 0.25) {
+      final rounded = _roundToStandardFraction(cups);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.flour,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: cups,
-        imperialUnit: 'cup${cups >= 1.5 ? 's' : ''}',
+        imperialValue: rounded.value,
+        imperialUnit: rounded.value >= 1.5 ? 'cups' : 'cup',
+        imperialNote: rounded.fraction,
       );
     } else {
       final ounces = grams / gramsPerOz;
+      final rounded = _roundToStandardFraction(ounces);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.flour,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: ounces,
+        imperialValue: rounded.value,
         imperialUnit: 'oz',
+        imperialNote: rounded.fraction,
       );
     }
   }
@@ -66,21 +70,25 @@ class MeasurementConverter {
     final cups = ml / mlPerCup;
     
     if (cups >= 0.25) {
+      final rounded = _roundToStandardFraction(cups);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.water,
         metricValue: ml,
         metricUnit: 'ml',
-        imperialValue: cups,
-        imperialUnit: 'cup${cups >= 1.5 ? 's' : ''}',
+        imperialValue: rounded.value,
+        imperialUnit: rounded.value >= 1.5 ? 'cups' : 'cup',
+        imperialNote: rounded.fraction,
       );
     } else {
       final flOz = ml / mlPerFlOz;
+      final rounded = _roundToStandardFraction(flOz);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.water,
         metricValue: ml,
         metricUnit: 'ml',
-        imperialValue: flOz,
+        imperialValue: rounded.value,
         imperialUnit: 'fl oz',
+        imperialNote: rounded.fraction,
       );
     }
   }
@@ -90,24 +98,24 @@ class MeasurementConverter {
     // Salt density: approximately 6g per teaspoon
     const gramsPerTsp = 6.0;
     final teaspoons = grams / gramsPerTsp;
+    final rounded = _roundToStandardFraction(teaspoons);
     
-    if (teaspoons >= 1.0) {
+    if (rounded.value < 0.125) {
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.salt,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: teaspoons,
-        imperialUnit: 'tsp',
+        imperialValue: 1.0,
+        imperialUnit: 'pinch',
       );
     } else {
-      // For very small amounts, show as fraction
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.salt,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: teaspoons,
-        imperialUnit: 'tsp',
-        imperialNote: teaspoons < 0.5 ? 'pinch' : null,
+        imperialValue: rounded.value,
+        imperialUnit: rounded.value == 1.0 ? 'tsp' : 'tsp',
+        imperialNote: rounded.fraction,
       );
     }
   }
@@ -117,13 +125,15 @@ class MeasurementConverter {
     // Active dry yeast: approximately 4g per teaspoon
     const gramsPerTsp = 4.0;
     final teaspoons = grams / gramsPerTsp;
+    final rounded = _roundToStandardFraction(teaspoons);
     
     return IngredientMeasurement.fromBoth(
       ingredientType: IngredientType.yeast,
       metricValue: grams,
       metricUnit: 'g',
-      imperialValue: teaspoons,
+      imperialValue: rounded.value,
       imperialUnit: 'tsp',
+      imperialNote: rounded.fraction,
     );
   }
 
@@ -132,13 +142,15 @@ class MeasurementConverter {
     // Granulated sugar: approximately 4g per teaspoon
     const gramsPerTsp = 4.0;
     final teaspoons = grams / gramsPerTsp;
+    final rounded = _roundToStandardFraction(teaspoons);
     
     return IngredientMeasurement.fromBoth(
       ingredientType: IngredientType.sugar,
       metricValue: grams,
       metricUnit: 'g',
-      imperialValue: teaspoons,
+      imperialValue: rounded.value,
       imperialUnit: 'tsp',
+      imperialNote: rounded.fraction,
     );
   }
 
@@ -150,21 +162,25 @@ class MeasurementConverter {
     final tablespoons = ml / mlPerTbsp;
     
     if (tablespoons >= 1.0) {
+      final rounded = _roundToStandardFraction(tablespoons);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.oil,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: tablespoons,
+        imperialValue: rounded.value,
         imperialUnit: 'tbsp',
+        imperialNote: rounded.fraction,
       );
     } else {
       final teaspoons = ml / mlPerTsp;
+      final rounded = _roundToStandardFraction(teaspoons);
       return IngredientMeasurement.fromBoth(
         ingredientType: IngredientType.oil,
         metricValue: grams,
         metricUnit: 'g',
-        imperialValue: teaspoons,
+        imperialValue: rounded.value,
         imperialUnit: 'tsp',
+        imperialNote: rounded.fraction,
       );
     }
   }
@@ -280,4 +296,82 @@ class MeasurementConverter {
       convertIngredient(ingredient: IngredientType.oil, metricValue: oilGrams),
     ];
   }
+
+  /// Round to standard kitchen fractions (1/4, 1/2, 3/4, etc.)
+  static StandardFraction _roundToStandardFraction(double value) {
+    // Define standard kitchen fractions
+    const fractions = [
+      FractionPair(1/8, '1/8'),
+      FractionPair(1/4, '1/4'),
+      FractionPair(1/3, '1/3'),
+      FractionPair(1/2, '1/2'),
+      FractionPair(2/3, '2/3'),
+      FractionPair(3/4, '3/4'),
+      FractionPair(1.0, ''),
+    ];
+
+    // For values >= 1, handle whole numbers + fractions
+    if (value >= 1.0) {
+      final wholeNumber = value.floor();
+      final fractionalPart = value - wholeNumber;
+      
+      if (fractionalPart < 0.0625) {
+        // Round down to whole number
+        return StandardFraction(wholeNumber.toDouble(), wholeNumber > 1 ? '$wholeNumber' : '');
+      }
+      
+      // Find closest standard fraction for the fractional part
+      FractionPair closest = fractions.first;
+      double minDiff = (fractionalPart - closest.value).abs();
+      
+      for (final fraction in fractions) {
+        final diff = (fractionalPart - fraction.value).abs();
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = fraction;
+        }
+      }
+      
+      if (closest.value == 1.0) {
+        // Round up to next whole number
+        return StandardFraction((wholeNumber + 1).toDouble(), '');
+      } else {
+        // Combine whole number with fraction
+        final displayText = wholeNumber > 0 ? '$wholeNumber ${closest.text}' : closest.text;
+        return StandardFraction(wholeNumber + closest.value, displayText);
+      }
+    } else {
+      // For values < 1, just find the closest standard fraction
+      if (value < 0.0625) {
+        return StandardFraction(0.125, '1/8'); // Minimum measurable amount
+      }
+      
+      FractionPair closest = fractions.first;
+      double minDiff = (value - closest.value).abs();
+      
+      for (final fraction in fractions) {
+        final diff = (value - fraction.value).abs();
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = fraction;
+        }
+      }
+      
+      return StandardFraction(closest.value, closest.text);
+    }
+  }
+}
+
+/// Helper class for standard kitchen fractions
+class StandardFraction {
+  const StandardFraction(this.value, this.fraction);
+  final double value;
+  final String fraction;
+}
+
+/// Helper class for fraction mapping
+class FractionPair {
+  const FractionPair(this.value, this.text);
+  final double value;
+  final String text;
 }
