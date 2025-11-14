@@ -288,11 +288,11 @@ class MeasurementConverter {
     required double oilGrams,
   }) {
     return [
-      convertIngredient(ingredient: IngredientType.flour, metricValue: flourGrams),
       convertIngredient(ingredient: IngredientType.water, metricValue: waterMl),
-      convertIngredient(ingredient: IngredientType.salt, metricValue: saltGrams),
-      convertIngredient(ingredient: IngredientType.yeast, metricValue: yeastGrams),
       convertIngredient(ingredient: IngredientType.sugar, metricValue: sugarGrams),
+      convertIngredient(ingredient: IngredientType.yeast, metricValue: yeastGrams),
+      convertIngredient(ingredient: IngredientType.flour, metricValue: flourGrams),
+      convertIngredient(ingredient: IngredientType.salt, metricValue: saltGrams),
       convertIngredient(ingredient: IngredientType.oil, metricValue: oilGrams),
     ];
   }

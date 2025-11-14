@@ -359,60 +359,6 @@ class CompactInputPanel extends StatelessWidget {
     return 'Slow fermentation - maximum flavor and digestibility';
   }
 
-  /// Build subtle keep awake toggle for bottom of ingredients box
-  Widget _buildSubtleKeepAwakeToggle(BuildContext context, CalculatorProvider provider) {
-    return InkWell(
-      onTap: () {
-        provider.toggleKeepAwake();
-        _showKeepAwakeFeedback(context, provider.keepAwake);
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
-              color: provider.keepAwake 
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
-                : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'Keep awake',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: provider.keepAwake 
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
-                  : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showKeepAwakeFeedback(BuildContext context, bool keepAwake) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          keepAwake 
-            ? 'Screen will stay awake during cooking'
-            : 'Screen will dim normally',
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          bottom: 100,
-          left: 16,
-          right: 16,
-        ),
-      ),
-    );
-  }
 
   /// Build compact quantity control for ingredients header
   Widget _buildCompactQuantityControl(BuildContext context, CalculatorProvider provider) {
@@ -672,28 +618,6 @@ class CompactInputPanel extends StatelessWidget {
                   const SizedBox(width: 12),
                 ],
                 
-                // Hydration display with icon
-                if (provider.showResults && provider.currentRecipe != null) ...[
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.water_drop,
-                        size: 14,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${provider.currentRecipe!.hydrationPercentage.toStringAsFixed(0)}%',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 8),
-                ],
                 
                 // Measurement system toggle
                 InkWell(
@@ -747,6 +671,60 @@ class CompactInputPanel extends StatelessWidget {
                 }).toList(),
               ),
               
+              // Hydration display and save option
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Hydration info (left side)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.water_drop,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Hydration: ${provider.currentRecipe!.hydrationPercentage.toStringAsFixed(0)}%',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Save as default button (right side)
+                  InkWell(
+                    onTap: () => _saveAsDefault(context, provider),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.bookmark_outline,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Save as default',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              
             ] else ...[
               // Placeholder when no valid inputs
               Container(
@@ -769,10 +747,6 @@ class CompactInputPanel extends StatelessWidget {
                 ),
               ),
             ],
-            
-            // Subtle keep awake toggle at bottom
-            const SizedBox(height: 4),
-            _buildSubtleKeepAwakeToggle(context, provider),
           ],
         ),
       ),
@@ -937,5 +911,42 @@ class CompactInputPanel extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Save current recipe settings as default
+  void _saveAsDefault(BuildContext context, CalculatorProvider provider) async {
+    try {
+      await provider.saveAsDefault();
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white, size: 20),
+                SizedBox(width: 8),
+                Text('Recipe saved as default'),
+              ],
+            ),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(
+              bottom: 80,
+              left: 16,
+              right: 16,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save default: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }

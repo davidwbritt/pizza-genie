@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/calculator_parameters.dart';
@@ -15,7 +16,7 @@ import '../constants/enums.dart';
 /// calculations, and persistence using SharedPreferences.
 class CalculatorProvider extends ChangeNotifier {
   CalculatorProvider() {
-    _loadSavedParameters();
+    _loadSavedData();
   }
 
   // Form state
@@ -289,5 +290,73 @@ class CalculatorProvider extends ChangeNotifier {
   /// Get validation hint for a specific field
   String? getValidationHint(String fieldName) {
     return ValidationService.validationHints[fieldName];
+  }
+
+  /// Save current recipe settings as default
+  Future<void> saveAsDefault() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('default_diameter', _diameterInput);
+      await prefs.setString('default_thickness', _thicknessInput);
+      await prefs.setString('default_proving_time', _provingTimeInput);
+      await prefs.setString('default_number_of_pizzas', _numberOfPizzasInput);
+      debugPrint('Default recipe settings saved');
+    } catch (e) {
+      debugPrint('Failed to save default settings: $e');
+      rethrow;
+    }
+  }
+
+  /// Load default recipe settings and apply them
+  Future<void> _loadDefaultSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final defaultDiameter = prefs.getString('default_diameter');
+      final defaultThickness = prefs.getString('default_thickness');
+      final defaultProvingTime = prefs.getString('default_proving_time');
+      final defaultNumberOfPizzas = prefs.getString('default_number_of_pizzas');
+
+      bool hasDefaults = false;
+
+      if (defaultDiameter != null) {
+        _diameterInput = defaultDiameter;
+        hasDefaults = true;
+      }
+      if (defaultThickness != null) {
+        _thicknessInput = defaultThickness;
+        hasDefaults = true;
+      }
+      if (defaultProvingTime != null) {
+        _provingTimeInput = defaultProvingTime;
+        hasDefaults = true;
+      }
+      if (defaultNumberOfPizzas != null) {
+        _numberOfPizzasInput = defaultNumberOfPizzas;
+        hasDefaults = true;
+      }
+
+      if (hasDefaults) {
+        // Clear any validation errors and recalculate
+        _validationErrors.clear();
+        
+        // Trigger auto-calculation if all inputs are valid
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!hasValidationErrors) {
+            calculateRecipe();
+          }
+          notifyListeners();
+        });
+        
+        debugPrint('Default recipe settings loaded: D=$defaultDiameter, T=$defaultThickness, P=$defaultProvingTime, N=$defaultNumberOfPizzas');
+      }
+    } catch (e) {
+      debugPrint('Failed to load default settings: $e');
+    }
+  }
+
+  /// Load saved data - first saved parameters, then defaults (which override if present)
+  Future<void> _loadSavedData() async {
+    await _loadSavedParameters();
+    await _loadDefaultSettings();
   }
 }
