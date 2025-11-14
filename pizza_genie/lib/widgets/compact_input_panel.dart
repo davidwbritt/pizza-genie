@@ -359,60 +359,6 @@ class CompactInputPanel extends StatelessWidget {
     return 'Slow fermentation - maximum flavor and digestibility';
   }
 
-  /// Build subtle keep awake toggle for bottom of ingredients box
-  Widget _buildSubtleKeepAwakeToggle(BuildContext context, CalculatorProvider provider) {
-    return InkWell(
-      onTap: () {
-        provider.toggleKeepAwake();
-        _showKeepAwakeFeedback(context, provider.keepAwake);
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
-              color: provider.keepAwake 
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
-                : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'Keep awake',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: provider.keepAwake 
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
-                  : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showKeepAwakeFeedback(BuildContext context, bool keepAwake) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          keepAwake 
-            ? 'Screen will stay awake during cooking'
-            : 'Screen will dim normally',
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          bottom: 100,
-          left: 16,
-          right: 16,
-        ),
-      ),
-    );
-  }
 
   /// Build compact quantity control for ingredients header
   Widget _buildCompactQuantityControl(BuildContext context, CalculatorProvider provider) {
@@ -769,10 +715,6 @@ class CompactInputPanel extends StatelessWidget {
                 ),
               ),
             ],
-            
-            // Subtle keep awake toggle at bottom
-            const SizedBox(height: 4),
-            _buildSubtleKeepAwakeToggle(context, provider),
           ],
         ),
       ),

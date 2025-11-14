@@ -38,20 +38,17 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundImage: AssetImage('assets/images/clevermonkey.jpg'),
+              backgroundImage: AssetImage('assets/images/clevermonkey.png'),
             ),
             const SizedBox(width: 8),
             const Text(AppConstants.appShortName),
           ],
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
-          ),
-        ],
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 1,
       ),
+      drawer: _buildDrawer(context),
       body: Consumer<CalculatorProvider>(
         builder: (context, provider, child) {
           return Column(
@@ -184,77 +181,88 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
 
   /// Build bottom action bar
   Widget _buildBottomActionBar(CalculatorProvider provider) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-            width: 1,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Keep awake toggle for page 0 - above the partition line
+        if (_currentPage == 0) ...[
+          _buildSubtleKeepAwakeToggle(context, provider),
+          const SizedBox(height: 8),
+        ],
+        
+        Container(
+          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            // Navigation hints and buttons
-            if (_currentPage == 0) ...[
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.swipe,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: SafeArea(
+            child: Row(
+              children: [
+                // Navigation hints and buttons
+                if (_currentPage == 0) ...[
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.swipe,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          provider.showResults ? 'Swipe right for cooking steps' : 'Recipe updates as you configure',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      provider.showResults ? 'Swipe right for cooking steps' : 'Recipe updates as you configure',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  
+                  // Quick navigate to steps button when recipe ready
+                  if (provider.showResults)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _pageController.animateToPage(
+                          1,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward, size: 18),
+                      label: const Text('Start Cooking'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              
-              // Quick navigate to steps button when recipe ready
-              if (provider.showResults)
-                ElevatedButton.icon(
-                  onPressed: () {
-                    _pageController.animateToPage(
-                      1,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  icon: const Icon(Icons.arrow_forward, size: 18),
-                  label: const Text('Start Cooking'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ] else ...[
+                  // Back to setup button
+                  TextButton.icon(
+                    onPressed: () {
+                      _pageController.animateToPage(
+                        0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    icon: const Icon(Icons.edit),
+                    label: const Text('Edit Recipe'),
                   ),
-                ),
-            ] else ...[
-              // Back to setup button
-              TextButton.icon(
-                onPressed: () {
-                  _pageController.animateToPage(
-                    0,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                icon: const Icon(Icons.edit),
-                label: const Text('Edit Recipe'),
-              ),
-              const Spacer(),
-              
-              _buildNewRecipeButton(provider),
-            ],
-          ],
+                  const Spacer(),
+                  
+                  _buildNewRecipeButton(provider),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -363,6 +371,219 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       curve: Curves.easeInOut,
     );
   }
+
+  /// Build navigation drawer with Italian-inspired design
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          // Clean header design
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary,
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundImage: AssetImage('assets/images/clevermonkey.png'),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Clevermonkey Pizza Genie',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // Menu items
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.local_pizza,
+                  title: 'Pizza Calculator',
+                  subtitle: 'Create perfect dough recipes',
+                  isSelected: true,
+                  onTap: () => Navigator.pop(context),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.info_outline,
+                  title: 'About',
+                  subtitle: 'About Clevermonkey Pizza Genie',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/about');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.history_edu,
+                  title: 'Pizza History',
+                  subtitle: 'The story of pizza',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/pizza-history');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.restaurant,
+                  title: 'Pizza Styles',
+                  subtitle: 'Regional pizza varieties',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/pizza-styles');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.emoji_events,
+                  title: 'Up Your Game',
+                  subtitle: 'Pro tips for pizza perfection',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/up-your-game');
+                  },
+                ),
+                const Divider(),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.settings,
+                  title: 'Settings',
+                  subtitle: 'App preferences',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/settings');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'Privacy',
+                  subtitle: 'Privacy policy',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/privacy');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isSelected = false,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isSelected 
+          ? Theme.of(context).colorScheme.primary 
+          : Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
+        ),
+      ),
+      subtitle: Text(subtitle),
+      selected: isSelected,
+      onTap: onTap,
+    );
+  }
+
+  /// Build subtle keep awake toggle at bottom
+  Widget _buildSubtleKeepAwakeToggle(BuildContext context, CalculatorProvider provider) {
+    return Center(
+      child: InkWell(
+        onTap: () {
+          provider.toggleKeepAwake();
+          _handleKeepAwake(provider.keepAwake);
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
+                color: provider.keepAwake 
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+                  : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                size: 14,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Keep awake',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: provider.keepAwake 
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                    : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleKeepAwake(bool keepAwake) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          keepAwake 
+            ? 'Screen will stay awake during cooking'
+            : 'Screen will dim normally',
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          bottom: 100,
+          left: 16,
+          right: 16,
+        ),
+      ),
+    );
+  }
+
 }
 
 /// Quick access floating action for common actions
