@@ -376,40 +376,28 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Build navigation drawer with Italian-inspired design
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.white,
       child: Column(
         children: [
-          // Clean header design
+          // Rich green header
           Container(
             height: 120,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.secondary,
-                ],
-              ),
+              color: Theme.of(context).colorScheme.primary,
             ),
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundImage: AssetImage('assets/images/clevermonkey.png'),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Clevermonkey Pizza Genie',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      'Clevermonkey Pizza Genie',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -501,6 +489,27 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                   onTap: () => _showCloseAppConfirmation(context),
                 ),
               ],
+            ),
+          ),
+          
+          // Clevermonkey logo footer
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: Color(0xFFE0E0E0),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Center(
+              child: CircleAvatar(
+                radius: 32,
+                backgroundColor: Colors.grey.shade100,
+                backgroundImage: const AssetImage('assets/images/clevermonkey.png'),
+              ),
             ),
           ),
         ],
