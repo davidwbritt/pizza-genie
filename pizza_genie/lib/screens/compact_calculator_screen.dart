@@ -35,10 +35,10 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       appBar: AppBar(
         title: const Text(AppConstants.appShortName),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 1,
         titleTextStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -386,11 +386,11 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // Rich green header
+          // Light green header
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
             ),
             child: SafeArea(
               child: Container(
@@ -401,13 +401,13 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       'Pizza Genie',
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                     ),
