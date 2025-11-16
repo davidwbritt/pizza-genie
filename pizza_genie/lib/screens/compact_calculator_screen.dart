@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/calculator_provider.dart';
 import '../constants/constants.dart';
-import '../constants/enums.dart';
 import '../widgets/compact_input_panel.dart';
-import '../widgets/compact_results_panel.dart';
 import '../widgets/cooking_steps_panel.dart';
 
 /// Compact calculator screen with horizontal swipe navigation
@@ -17,7 +15,8 @@ class CompactCalculatorScreen extends StatefulWidget {
   const CompactCalculatorScreen({super.key});
 
   @override
-  State<CompactCalculatorScreen> createState() => _CompactCalculatorScreenState();
+  State<CompactCalculatorScreen> createState() =>
+      _CompactCalculatorScreenState();
 }
 
 class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
@@ -34,20 +33,14 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundImage: AssetImage('assets/images/clevermonkey.png'),
-            ),
-            const SizedBox(width: 8),
-            const Text(AppConstants.appShortName),
-          ],
-        ),
+        title: const Text(AppConstants.appShortName),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
         elevation: 1,
+        titleTextStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       drawer: _buildDrawer(context),
       body: Consumer<CalculatorProvider>(
@@ -56,7 +49,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             children: [
               // Page indicator and navigation
               _buildPageIndicator(provider),
-              
+
               // Main content area with horizontal swipe
               Expanded(
                 child: PageView(
@@ -69,7 +62,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                   children: [
                     // Page 1: Setup with Live Recipe
                     const CompactInputPanel(),
-                    
+
                     // Page 2: Cooking Steps (only if recipe is available)
                     if (provider.showResults)
                       const CookingStepsPanel()
@@ -78,7 +71,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                   ],
                 ),
               ),
-              
+
               // Bottom action bar
               _buildBottomActionBar(provider),
             ],
@@ -91,7 +84,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Build page indicator at the top
   Widget _buildPageIndicator(CalculatorProvider provider) {
     final totalPages = provider.showResults ? 2 : 1;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppConstants.defaultPadding,
@@ -109,15 +102,15 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                 width: isActive ? 24 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: isActive 
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  color: isActive
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
             }),
           ),
-          
+
           if (totalPages > 1) ...[
             const SizedBox(width: 16),
             Text(
@@ -157,7 +150,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
               color: Theme.of(context).colorScheme.outline,
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               'Configure your pizza to see cooking steps',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -166,7 +159,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            
+
             Text(
               'Swipe left to setup your pizza',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -190,7 +183,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
           _buildSubtleKeepAwakeToggle(context, provider),
           const SizedBox(height: 8),
         ],
-        
+
         Container(
           padding: const EdgeInsets.all(AppConstants.defaultPadding),
           decoration: BoxDecoration(
@@ -217,15 +210,20 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          provider.showResults ? 'Swipe right for cooking steps' : 'Recipe updates as you configure',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          provider.showResults
+                              ? 'Swipe right for cooking steps'
+                              : 'Recipe updates as you configure',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // Quick navigate to steps button when recipe ready
                   if (provider.showResults)
                     ElevatedButton.icon(
@@ -239,7 +237,10 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                       icon: const Icon(Icons.arrow_forward, size: 18),
                       label: const Text('Start Cooking'),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                 ] else ...[
@@ -256,7 +257,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                     label: const Text('Edit Recipe'),
                   ),
                   const Spacer(),
-                  
+
                   _buildNewRecipeButton(provider),
                 ],
               ],
@@ -270,42 +271,44 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Build calculate button
   Widget _buildCalculateButton(CalculatorProvider provider) {
     return ElevatedButton(
-      onPressed: provider.isCalculating ? null : () async {
-        final success = await provider.calculateRecipe();
-        
-        if (success && mounted) {
-          // Auto-navigate to results
-          _pageController.animateToPage(
-            1,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        } else if (!success && mounted) {
-          // Show error feedback
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                provider.validationErrors.values.first,
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.error,
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.only(
-                bottom: MediaQuery.of(context).size.height * 0.1,
-                left: AppConstants.defaultPadding,
-                right: AppConstants.defaultPadding,
-              ),
-            ),
-          );
-        }
-      },
+      onPressed: provider.isCalculating
+          ? null
+          : () async {
+              final success = await provider.calculateRecipe();
+
+              if (success && mounted) {
+                // Auto-navigate to results
+                _pageController.animateToPage(
+                  1,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              } else if (!success && mounted) {
+                // Show error feedback
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      provider.validationErrors.values.first,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).size.height * 0.1,
+                      left: AppConstants.defaultPadding,
+                      right: AppConstants.defaultPadding,
+                    ),
+                  ),
+                );
+              }
+            },
       child: provider.isCalculating
-        ? const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          )
-        : const Text('Recipe >'),
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Text('Recipe >'),
     );
   }
 
@@ -321,11 +324,15 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Show confirmation dialog before resetting recipe
   void _showNewRecipeConfirmation(CalculatorProvider provider) {
     // Only show confirmation if user has made selections or has a calculated recipe
-    final hasContent = provider.showResults || 
+    final hasContent =
+        provider.showResults ||
         provider.diameterInput != AppConstants.defaultDiameter.toString() ||
-        provider.thicknessInput != AppConstants.defaultThicknessLevel.toString() ||
-        provider.provingTimeInput != AppConstants.defaultProvingTimeHours.toString() ||
-        provider.numberOfPizzasInput != AppConstants.defaultNumberOfPizzas.toString();
+        provider.thicknessInput !=
+            AppConstants.defaultThicknessLevel.toString() ||
+        provider.provingTimeInput !=
+            AppConstants.defaultProvingTimeHours.toString() ||
+        provider.numberOfPizzasInput !=
+            AppConstants.defaultNumberOfPizzas.toString();
 
     if (!hasContent) {
       // No content to lose, just reset directly
@@ -388,24 +395,28 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             child: SafeArea(
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Clevermonkey Pizza Genie',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      'Pizza Genie',
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          
+
           // Menu items
           Expanded(
             child: ListView(
@@ -491,24 +502,23 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
               ],
             ),
           ),
-          
+
           // Clevermonkey logo footer
           Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
-                top: BorderSide(
-                  color: Color(0xFFE0E0E0),
-                  width: 1,
-                ),
+                top: BorderSide(color: Color(0xFFE0E0E0), width: 1),
               ),
             ),
             child: Center(
               child: CircleAvatar(
-                radius: 32,
-                backgroundColor: Colors.grey.shade100,
-                backgroundImage: const AssetImage('assets/images/clevermonkey.png'),
+                radius: 50,
+                backgroundColor: Colors.white,
+                backgroundImage: const AssetImage(
+                  'assets/images/clevermonkey.png',
+                ),
               ),
             ),
           ),
@@ -528,9 +538,9 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
     return ListTile(
       leading: Icon(
         icon,
-        color: isSelected 
-          ? Theme.of(context).colorScheme.primary 
-          : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       title: Text(
         title,
@@ -546,7 +556,10 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   }
 
   /// Build subtle keep awake toggle at bottom
-  Widget _buildSubtleKeepAwakeToggle(BuildContext context, CalculatorProvider provider) {
+  Widget _buildSubtleKeepAwakeToggle(
+    BuildContext context,
+    CalculatorProvider provider,
+  ) {
     return Center(
       child: InkWell(
         onTap: () {
@@ -561,18 +574,22 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             children: [
               Icon(
                 provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
-                color: provider.keepAwake 
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
-                  : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                color: provider.keepAwake
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant.withOpacity(0.5),
                 size: 14,
               ),
               const SizedBox(width: 4),
               Text(
                 'Keep awake',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: provider.keepAwake 
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
-                    : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  color: provider.keepAwake
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withOpacity(0.6),
                   fontSize: 11,
                 ),
               ),
@@ -587,17 +604,13 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          keepAwake 
-            ? 'Screen will stay awake during cooking'
-            : 'Screen will dim normally',
+          keepAwake
+              ? 'Screen will stay awake during cooking'
+              : 'Screen will dim normally',
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          bottom: 100,
-          left: 16,
-          right: 16,
-        ),
+        margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
       ),
     );
   }
@@ -614,9 +627,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             Text('Close Pizza Genie?'),
           ],
         ),
-        content: const Text(
-          'Are you sure you want to exit the app?',
-        ),
+        content: const Text('Are you sure you want to exit the app?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -634,7 +645,6 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       ),
     );
   }
-
 }
 
 /// Quick access floating action for common actions
@@ -666,12 +676,12 @@ class QuickActionsFAB extends StatelessWidget {
           children: [
             Text(
               'Quick Presets',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -694,7 +704,7 @@ class QuickActionsFAB extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            
+
             Row(
               children: [
                 Expanded(
@@ -739,10 +749,7 @@ class QuickActionsFAB extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
               Text(
                 description,
                 style: TextStyle(

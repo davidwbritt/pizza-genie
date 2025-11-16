@@ -654,10 +654,10 @@ class CompactInputPanel extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                           ),
                         ),
                         child: Row(
@@ -798,26 +798,12 @@ class CompactInputPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.15),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
-          ],
-        ),
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
