@@ -494,9 +494,9 @@ class AboutScreen extends StatelessWidget {
                   Container(
                     width: 120,
                     height: 120,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                      color: Colors.white,
                     ),
                     child: ClipOval(
                       child: Image.asset(
@@ -578,27 +578,27 @@ class AboutScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary,
                 width: 1,
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.local_cafe,
                   size: 24,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color: Colors.white,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Buy me a coffee',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    color: Colors.white,
                   ),
                 ),
               ],
