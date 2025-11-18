@@ -33,7 +33,34 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.appShortName),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/images/icon.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(AppConstants.appShortName),
+          ],
+        ),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 1,
@@ -384,7 +411,9 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
-      child: Column(
+      child: Stack(
+        children: [
+          Column(
         children: [
           // Light green header
           Container(
@@ -518,6 +547,25 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                 backgroundColor: Colors.white,
                 backgroundImage: const AssetImage(
                   'assets/images/clevermonkey.png',
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+          
+          // Decorative border on right edge
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 20,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/border-vertical.png'),
+                  fit: BoxFit.cover,
+                  repeat: ImageRepeat.repeat,
                 ),
               ),
             ),

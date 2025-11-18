@@ -173,7 +173,7 @@ class CalculationService {
       'Let portioned dough rest 15-30 minutes before shaping',
       'Gently stretch from center outward, preserving air bubbles',
       'Add sauce, leaving 1-inch border for crust',
-      'Bake on preheated pizza stone at highest oven temperature (500-550°F)',
+      'Bake on preheated pizza steel (or inverted cast iron pan for smaller pizzas) at highest oven temperature (500-550°F)',
     ]);
 
     return steps;
