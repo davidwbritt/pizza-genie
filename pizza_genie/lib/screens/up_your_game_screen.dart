@@ -74,6 +74,13 @@ class UpYourGameScreen extends StatelessWidget {
               content: 'Pizza needs extreme heat - 800°F+ for Neapolitan style. Home ovens max out around 500°F, so use a pizza steel preheated for at least 45 minutes. Steel conducts heat better than stone, won\'t crack, and gives consistently excellent results.',
             ),
             
+            _buildTipSection(
+              context,
+              icon: Icons.terrain,
+              title: 'Altitude Adjustments',
+              content: 'High altitude (above 3,000 feet) dramatically affects dough behavior. Lower air pressure causes faster rising - reduce yeast by 25% and proving time by 20-30%. Also increase hydration by 1-2% and add a pinch more salt. At very high altitudes (7,000+ feet), you may need to reduce yeast by half.',
+            ),
+            
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),

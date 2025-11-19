@@ -166,7 +166,7 @@ class CalculationService {
         'Shape into a ball and place in oiled bowl',
         'Cover and let rise at room temperature for ${parameters.provingTimeHours.hours} hours',
         'For best flavor, refrigerate after 2 hours of room temperature rise',
-        'Dough is ready when doubled and feels light and airy',
+        'Dough is ready when doubled and feels light and airy (at high altitude 3000+ ft, rising happens 25-50% faster)',
       ]);
     }
 

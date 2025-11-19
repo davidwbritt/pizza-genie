@@ -109,16 +109,6 @@ class ProvingTime {
     return ProvingTime(hours);
   }
   
-  /// Get contextual guidance message for this proving time
-  String get guidanceMessage {
-    if (hours <= 6) {
-      return AppConstants.guidanceQuickProving;
-    } else if (hours <= 24) {
-      return AppConstants.guidanceStandardProving;
-    } else {
-      return AppConstants.guidanceLongProving;
-    }
-  }
   
   @override
   bool operator ==(Object other) =>

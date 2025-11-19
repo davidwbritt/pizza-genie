@@ -84,10 +84,6 @@ class PizzaDoughRecipe {
     return (waterMilliliters / flourGrams) * 100;
   }
 
-  /// Get proving time guidance message
-  String get provingGuidance {
-    return calculatedFor.provingTimeHours.guidanceMessage;
-  }
 
   /// Get pizza style description
   String get pizzaStyleDescription {
