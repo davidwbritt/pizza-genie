@@ -136,14 +136,13 @@ class CalculationService {
     final bool isQuickProve = parameters.provingTimeHours.hours <= 4;
     
     final List<String> steps = [
-      'Measure all ingredients using a kitchen scale for accuracy',
-      'Mix lukewarm water (100-110°F), sugar, and yeast in a small bowl',
+      'Measure ingredients using a kitchen scale if available, otherwise use imperial measurements',
+      'Mix lukewarm water (100-110°F), sugar, and yeast in a small bowl or mixer bowl',
       'Let mixture sit for 5 minutes until foamy (proves yeast is active)',
-      'Place flour in large mixing bowl and create a well in center',
-      'Pour foamy yeast mixture into flour well and mix gently',
-      'Add salt around edges (keep away from yeast initially) and mix',
-      'Mix until shaggy dough forms, then add olive oil',
-      'Knead for 8-10 minutes until smooth, elastic, and slightly tacky',
+      'Add flour to the foamy yeast mixture and mix until just combined',
+      'Distribute salt evenly over the mixture and mix in thoroughly',
+      'Add olive oil and knead for 8-10 minutes by hand or 5-6 minutes with a stand mixer',
+      'Knead until dough is smooth, elastic, and slightly tacky (not sticky)',
     ];
 
     if (isLongProve) {
