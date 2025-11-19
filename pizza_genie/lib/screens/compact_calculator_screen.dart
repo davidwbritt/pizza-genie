@@ -213,7 +213,11 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
         ],
 
         Container(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          padding: EdgeInsets.all(
+            MediaQuery.of(context).orientation == Orientation.landscape 
+              ? AppConstants.defaultPadding * 0.5 
+              : AppConstants.defaultPadding
+          ),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             border: Border(
@@ -261,8 +265,19 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                             curve: Curves.easeInOut,
                           );
                         },
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Edit Recipe'),
+                        icon: Icon(Icons.edit, size: MediaQuery.of(context).orientation == Orientation.landscape ? 14 : 18),
+                        label: Text('Edit Recipe', style: TextStyle(fontSize: MediaQuery.of(context).orientation == Orientation.landscape ? 11 : 14)),
+                        style: TextButton.styleFrom(
+                          padding: MediaQuery.of(context).orientation == Orientation.landscape 
+                            ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+                            : null,
+                          minimumSize: MediaQuery.of(context).orientation == Orientation.landscape 
+                            ? const Size(60, 24) 
+                            : null,
+                          tapTargetSize: MediaQuery.of(context).orientation == Orientation.landscape 
+                            ? MaterialTapTargetSize.shrinkWrap 
+                            : MaterialTapTargetSize.padded,
+                        ),
                       ),
                       const Spacer(),
 
@@ -323,10 +338,20 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
 
   /// Build new recipe button
   Widget _buildNewRecipeButton(CalculatorProvider provider) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    
     return ElevatedButton.icon(
       onPressed: () => _showNewRecipeConfirmation(provider),
-      icon: const Icon(Icons.refresh),
-      label: const Text('New Recipe'),
+      icon: Icon(Icons.refresh, size: isLandscape ? 14 : 18),
+      label: Text('New Recipe', style: TextStyle(fontSize: isLandscape ? 11 : 14)),
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(
+          horizontal: isLandscape ? 8 : 16,
+          vertical: isLandscape ? 4 : 8,
+        ),
+        minimumSize: isLandscape ? const Size(60, 24) : null,
+        tapTargetSize: isLandscape ? MaterialTapTargetSize.shrinkWrap : MaterialTapTargetSize.padded,
+      ),
     );
   }
 
