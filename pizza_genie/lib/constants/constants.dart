@@ -65,10 +65,6 @@ class AppConstants {
     'invalidProvingTime': errorInvalidProvingTime,
   };
   
-  // Guidance Messages
-  static const String guidanceQuickProving = 'Quick preparation - higher yeast for fast rise';
-  static const String guidanceStandardProving = 'Balanced fermentation - good flavor development';
-  static const String guidanceLongProving = 'Extended fermentation - maximum flavor and digestibility';
 }
 
 /// Pizza Style Names
