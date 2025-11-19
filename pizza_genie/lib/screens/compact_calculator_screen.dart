@@ -242,13 +242,18 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                           curve: Curves.easeInOut,
                         );
                       },
-                      icon: const Icon(Icons.arrow_forward, size: 18),
-                      label: const Text('Start Cooking'),
+                      icon: Icon(Icons.arrow_forward, size: MediaQuery.of(context).orientation == Orientation.landscape ? 14 : 18),
+                      label: Text('Start Cooking', style: TextStyle(fontSize: MediaQuery.of(context).orientation == Orientation.landscape ? 11 : 14)),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
+                        padding: MediaQuery.of(context).orientation == Orientation.landscape 
+                          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
+                          : const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        minimumSize: MediaQuery.of(context).orientation == Orientation.landscape 
+                          ? const Size(80, 28) 
+                          : null,
+                        tapTargetSize: MediaQuery.of(context).orientation == Orientation.landscape 
+                          ? MaterialTapTargetSize.shrinkWrap 
+                          : MaterialTapTargetSize.padded,
                       ),
                     ),
                   ),
