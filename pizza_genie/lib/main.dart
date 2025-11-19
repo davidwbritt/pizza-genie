@@ -12,7 +12,6 @@ import 'screens/up_your_game_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/privacy_screen.dart';
 import 'screens/pizza_history_screen.dart';
-import 'screens/settings_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -45,7 +44,6 @@ class PizzaGenieApp extends StatelessWidget {
   static Map<String, WidgetBuilder> get _routes {
     return {
       '/calculator': (context) => const CompactCalculatorScreen(),
-      '/settings': (context) => const SettingsScreen(),
       '/about': (context) => const AboutScreen(),
       '/privacy': (context) => const PrivacyScreen(),
       '/pizza-history': (context) => const PizzaHistoryScreen(),

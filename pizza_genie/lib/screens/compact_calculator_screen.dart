@@ -502,16 +502,6 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                 const Divider(),
                 _buildDrawerItem(
                   context,
-                  icon: Icons.settings,
-                  title: 'Settings',
-                  subtitle: 'App preferences',
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/settings');
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
                   icon: Icons.privacy_tip_outlined,
                   title: 'Privacy',
                   subtitle: 'Privacy policy',
