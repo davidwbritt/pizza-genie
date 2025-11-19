@@ -18,29 +18,23 @@ class CompactInputPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CalculatorProvider>(
       builder: (context, provider, child) {
+        final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+        
         return SingleChildScrollView(
           padding: const EdgeInsets.all(AppConstants.defaultPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Pizza diameter selector
-              _buildDiameterSelector(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding),
-              
-              // Thickness selector with visual preview
-              _buildThicknessSelector(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding),
-              
-              // Proving time with slider
-              _buildProvingTimeSlider(context, provider),
-              const SizedBox(height: AppConstants.defaultPadding),
-              
-              // Quick presets (temporarily hidden)
-              // _buildQuickPresets(context, provider),
-              // const SizedBox(height: AppConstants.defaultPadding * 1.5),
-              
-              // Live ingredients preview
-              _buildLiveIngredientsPreview(context, provider),
+              if (isLandscape) ...[
+                // Landscape layout: side-by-side controls (includes ingredients preview)
+                _buildLandscapeControls(context, provider),
+              ] else ...[
+                // Portrait layout: stacked controls
+                _buildPortraitControls(context, provider),
+                const SizedBox(height: AppConstants.defaultPadding * 0.75),
+                // Live ingredients preview (full width in portrait)
+                _buildLiveIngredientsPreview(context, provider),
+              ],
               
               // Validation errors
               if (provider.hasValidationErrors)
@@ -49,6 +43,60 @@ class CompactInputPanel extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  /// Build landscape layout with side-by-side controls
+  Widget _buildLandscapeControls(BuildContext context, CalculatorProvider provider) {
+    return Column(
+      children: [
+        // Row 1: Diameter and Thickness side by side
+        Row(
+          children: [
+            Expanded(
+              child: _buildDiameterSelector(context, provider),
+            ),
+            const SizedBox(width: AppConstants.defaultPadding),
+            Expanded(
+              child: _buildThicknessSelector(context, provider),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppConstants.defaultPadding * 0.75),
+        
+        // Row 2: Proving time and Recipe side by side (equal width)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildProvingTimeSlider(context, provider),
+            ),
+            const SizedBox(width: AppConstants.defaultPadding),
+            Expanded(
+              child: _buildLiveIngredientsPreview(context, provider),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Build portrait layout with stacked controls
+  Widget _buildPortraitControls(BuildContext context, CalculatorProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Pizza diameter selector
+        _buildDiameterSelector(context, provider),
+        const SizedBox(height: AppConstants.defaultPadding * 0.75),
+        
+        // Thickness selector with visual preview
+        _buildThicknessSelector(context, provider),
+        const SizedBox(height: AppConstants.defaultPadding * 0.75),
+        
+        // Proving time with slider
+        _buildProvingTimeSlider(context, provider),
+      ],
     );
   }
 
@@ -69,7 +117,7 @@ class CompactInputPanel extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Pizza Size',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -143,13 +191,13 @@ class CompactInputPanel extends StatelessWidget {
   }
 
   double _getDiameterDisplaySize(double diameter) {
-    // Map diameter to display size (28-50px range) - more compact
+    // Map diameter to display size - reduced by factor for compactness
     switch (diameter) {
-      case 10.0: return 30;
-      case 12.0: return 36;
-      case 14.0: return 42;
-      case 16.0: return 48;
-      default: return 36;
+      case 10.0: return 26; // Reduced from 30
+      case 12.0: return 32; // Reduced from 36
+      case 14.0: return 36; // Reduced from 42
+      case 16.0: return 40; // Reduced from 48
+      default: return 32;
     }
   }
 
@@ -180,7 +228,7 @@ class CompactInputPanel extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Crust Style',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -255,8 +303,8 @@ class CompactInputPanel extends StatelessWidget {
   }
 
   double _getThicknessBarHeight(int level) {
-    // Map thickness level to bar height (8-28px range) - more compact
-    return 8.0 + (level * 4.0);
+    // Map thickness level to bar height - reduced for compactness
+    return 6.0 + (level * 3.0); // Reduced from 8+4 to 6+3
   }
 
   String _getShortStyleName(ThicknessLevel thickness) {
@@ -286,7 +334,7 @@ class CompactInputPanel extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Proving Time',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -302,19 +350,11 @@ class CompactInputPanel extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         
-        Text(
-          _getProvingTimeDescription(currentTime),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 8),
-        
         // Proving time slider
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            trackHeight: 6,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+            trackHeight: 4, // Reduced from 6
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10), // Reduced from 12
           ),
           child: Slider(
             value: currentTime.toDouble(),
@@ -328,14 +368,13 @@ class CompactInputPanel extends StatelessWidget {
           ),
         ),
         
-        // Time markers
+        // Time markers (hours only)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTimeMarker(context, '2h\nQuick'),
-            _buildTimeMarker(context, '8h\nSame day'),
-            _buildTimeMarker(context, '24h\nOvernight'),
-            _buildTimeMarker(context, '48h\nSlow'),
+            _buildTimeMarker(context, '2h'),
+            _buildTimeMarker(context, '24h'),
+            _buildTimeMarker(context, '48h'),
           ],
         ),
       ],
@@ -352,14 +391,6 @@ class CompactInputPanel extends StatelessWidget {
       textAlign: TextAlign.center,
     );
   }
-
-  String _getProvingTimeDescription(int hours) {
-    if (hours <= 4) return 'Quick rise - higher yeast, same day baking';
-    if (hours <= 12) return 'Balanced fermentation - good flavor development';
-    if (hours <= 24) return 'Overnight prove - excellent flavor and texture';
-    return 'Slow fermentation - maximum flavor and digestibility';
-  }
-
 
   /// Build compact quantity control for ingredients header
   Widget _buildCompactQuantityControl(BuildContext context, CalculatorProvider provider) {
@@ -397,7 +428,7 @@ class CompactInputPanel extends StatelessWidget {
         // Quantity display
         Text(
           'x$currentCount',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -632,10 +663,8 @@ class CompactInputPanel extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Your Recipe',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 const Spacer(),
@@ -691,9 +720,9 @@ class CompactInputPanel extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 3,
-                childAspectRatio: 2.2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                childAspectRatio: 2.4, // Reduced to give more height for text
+                crossAxisSpacing: 6,    // Reduced spacing
+                mainAxisSpacing: 6,     // Reduced spacing
                 children: provider.currentMeasurements.map((measurement) {
                   return _buildCompactIngredientTile(context, measurement);
                 }).toList(),
@@ -720,6 +749,74 @@ class CompactInputPanel extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      
+                      // Hydration adjustment controls
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Decrease button
+                          GestureDetector(
+                            onTap: provider.hydrationAdjustment > -10 
+                              ? () => provider.updateHydrationAdjustment(provider.hydrationAdjustment - 1)
+                              : null,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: provider.hydrationAdjustment > -10 
+                                  ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                                  : Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                                border: Border.all(
+                                  color: provider.hydrationAdjustment > -10 
+                                    ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+                                    : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.remove,
+                                size: 12,
+                                color: provider.hydrationAdjustment > -10 
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline.withOpacity(0.4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          
+                          // Increase button
+                          GestureDetector(
+                            onTap: provider.hydrationAdjustment < 15 
+                              ? () => provider.updateHydrationAdjustment(provider.hydrationAdjustment + 1)
+                              : null,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: provider.hydrationAdjustment < 15 
+                                  ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                                  : Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                                border: Border.all(
+                                  color: provider.hydrationAdjustment < 15 
+                                    ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+                                    : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                size: 12,
+                                color: provider.hydrationAdjustment < 15 
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline.withOpacity(0.4),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -796,10 +893,10 @@ class CompactInputPanel extends StatelessWidget {
   /// Build compact ingredient tile for live preview
   Widget _buildCompactIngredientTile(BuildContext context, IngredientMeasurement measurement) {
     return Container(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(4), // Reduced padding
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6), // Smaller radius
         border: Border.all(
           color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           width: 1,
@@ -807,26 +904,30 @@ class CompactInputPanel extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min, // Prevent overflow
         children: [
-          Row(
-            children: [
-              Text(
-                _getIngredientEmoji(measurement.ingredientType),
-                style: const TextStyle(fontSize: 12),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: Text(
-                  measurement.ingredientType.displayName,
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+          Flexible(
+            child: Row(
+              children: [
+                Text(
+                  _getIngredientEmoji(measurement.ingredientType),
+                  style: const TextStyle(fontSize: 11), // Smaller emoji
                 ),
-              ),
-            ],
+                const SizedBox(width: 2),
+                Expanded(
+                  child: Text(
+                    measurement.ingredientType.displayName,
+                    style: TextStyle(
+                      fontSize: 8, // Smaller text
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
           ),
           Consumer<CalculatorProvider>(
             builder: (context, prov, child) {
@@ -979,4 +1080,5 @@ class CompactInputPanel extends StatelessWidget {
       }
     }
   }
+
 }

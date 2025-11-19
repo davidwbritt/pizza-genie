@@ -21,10 +21,13 @@ class CalculationService {
       thickness: parameters.thicknessLevel,
     ) * parameters.numberOfPizzas;
 
-    // Get style-specific ratios
-    final double hydrationRatio = PizzaFormulas.getHydrationRatio(
+    // Get style-specific ratios with user adjustment
+    final double baseHydrationRatio = PizzaFormulas.getHydrationRatio(
       parameters.thicknessLevel,
     );
+    
+    // Apply hydration adjustment (convert percentage points to decimal)
+    final double hydrationRatio = baseHydrationRatio + (parameters.hydrationAdjustment / 100.0);
     
     final double yeastRatio = PizzaFormulas.getYeastRatio(
       parameters.thicknessLevel,

@@ -207,8 +207,9 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
       children: [
         // Keep awake toggle for page 0 - above the partition line
         if (_currentPage == 0) ...[
+          const SizedBox(height: 8), // Add spacing before toggle
           _buildSubtleKeepAwakeToggle(context, provider),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12), // Increased spacing after toggle
         ],
 
         Container(
@@ -223,37 +224,13 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
             ),
           ),
           child: SafeArea(
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Navigation hints and buttons
-                if (_currentPage == 0) ...[
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.swipe,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          provider.showResults
-                              ? 'Swipe right for cooking steps'
-                              : 'Recipe updates as you configure',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Quick navigate to steps button when recipe ready
-                  if (provider.showResults)
-                    ElevatedButton.icon(
+                // Center the Start Cooking button when recipe ready
+                if (_currentPage == 0 && provider.showResults)
+                  Center(
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         _pageController.animateToPage(
                           1,
@@ -265,28 +242,33 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
                       label: const Text('Start Cooking'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: 20,
+                          vertical: 12,
                         ),
                       ),
                     ),
-                ] else ...[
-                  // Back to setup button
-                  TextButton.icon(
-                    onPressed: () {
-                      _pageController.animateToPage(
-                        0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Edit Recipe'),
                   ),
-                  const Spacer(),
+                
+                if (_currentPage != 0)
+                  Row(
+                    children: [
+                      // Back to setup button
+                      TextButton.icon(
+                        onPressed: () {
+                          _pageController.animateToPage(
+                            0,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit Recipe'),
+                      ),
+                      const Spacer(),
 
-                  _buildNewRecipeButton(provider),
-                ],
+                      _buildNewRecipeButton(provider),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -410,7 +392,7 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
   /// Build navigation drawer with Italian-inspired design
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       child: Stack(
         children: [
           Column(
@@ -525,16 +507,19 @@ class _CompactCalculatorScreenState extends State<CompactCalculatorScreen> {
           // Clevermonkey logo footer
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
               border: Border(
-                top: BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                top: BorderSide(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2), 
+                  width: 1,
+                ),
               ),
             ),
             child: Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 backgroundImage: const AssetImage(
                   'assets/images/clevermonkey.png',
                 ),
