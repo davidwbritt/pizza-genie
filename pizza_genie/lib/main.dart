@@ -30,11 +30,18 @@ class PizzaGenieApp extends StatelessWidget {
       child: MaterialApp(
         title: AppConstants.appName,
         theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system, // Will be controlled by ThemeProvider later
+        darkTheme: AppTheme.lightTheme, // Force light theme to prevent system overrides
+        themeMode: ThemeMode.light, // Always use our custom Italian theme
         home: const SplashScreen(),
         routes: _routes,
         debugShowCheckedModeBanner: false,
+        // Disable Material You dynamic theming
+        builder: (context, child) {
+          return Theme(
+            data: AppTheme.lightTheme,
+            child: child ?? const SizedBox(),
+          );
+        },
       ),
     );
   }

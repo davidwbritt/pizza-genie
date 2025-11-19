@@ -20,6 +20,7 @@ class CookingStepsPanel extends StatefulWidget {
 class _CookingStepsPanelState extends State<CookingStepsPanel> {
   int _currentStep = 0;
   final ScrollController _scrollController = ScrollController();
+  final List<GlobalKey> _stepKeys = [];
 
   @override
   void dispose() {
@@ -27,19 +28,19 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
     super.dispose();
   }
 
-  /// Auto-scroll to current step
+  /// Auto-scroll to current step using widget-based positioning
   void _scrollToCurrentStep() {
-    if (_scrollController.hasClients) {
-      // Calculate approximate position of current step
-      // Each step item is approximately 88px (16px padding + 56px content + 16px margin)
-      const double itemHeight = 88.0;
-      final double targetPosition = _currentStep * itemHeight;
-      
-      _scrollController.animateTo(
-        targetPosition,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+    if (_scrollController.hasClients && _currentStep < _stepKeys.length) {
+      final currentContext = _stepKeys[_currentStep].currentContext;
+      if (currentContext != null) {
+        // Use Scrollable.ensureVisible for accurate positioning
+        Scrollable.ensureVisible(
+          currentContext,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: 0.1, // Position step near top of visible area
+        );
+      }
     }
   }
 
@@ -54,6 +55,15 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
         }
 
         final steps = provider.getPreparationSteps();
+
+        // Initialize keys for each step if needed
+        while (_stepKeys.length < steps.length) {
+          _stepKeys.add(GlobalKey());
+        }
+        // Remove excess keys if steps reduced
+        if (_stepKeys.length > steps.length) {
+          _stepKeys.removeRange(steps.length, _stepKeys.length);
+        }
 
         return Column(
           children: [
@@ -267,6 +277,7 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
         final isUpcoming = index > _currentStep;
         
         return GestureDetector(
+          key: _stepKeys[index], // Add key for precise scrolling
           onTap: () {
             setState(() {
               _currentStep = index;

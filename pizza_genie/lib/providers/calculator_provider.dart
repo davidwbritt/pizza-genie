@@ -37,6 +37,7 @@ class CalculatorProvider extends ChangeNotifier {
   String _thicknessInput = AppConstants.defaultThicknessLevel.toString();
   String _provingTimeInput = AppConstants.defaultProvingTimeHours.toString();
   String _numberOfPizzasInput = AppConstants.defaultNumberOfPizzas.toString();
+  int _hydrationAdjustment = 0;
 
   // Getters
   CalculatorParameters get parameters => _parameters;
@@ -55,6 +56,7 @@ class CalculatorProvider extends ChangeNotifier {
   String get thicknessInput => _thicknessInput;
   String get provingTimeInput => _provingTimeInput;
   String get numberOfPizzasInput => _numberOfPizzasInput;
+  int get hydrationAdjustment => _hydrationAdjustment;
 
   /// Update diameter input and validate
   void updateDiameter(String value) {
@@ -67,6 +69,11 @@ class CalculatorProvider extends ChangeNotifier {
   void updateThickness(String value) {
     _thicknessInput = value;
     _validateField('thickness', value);
+    
+    // Reset hydration adjustment when crust type changes
+    // This gives users the appropriate base hydration for the new style
+    _hydrationAdjustment = 0;
+    
     notifyListeners();
   }
 
@@ -82,6 +89,16 @@ class CalculatorProvider extends ChangeNotifier {
     _numberOfPizzasInput = value;
     _validateField('numberOfPizzas', value);
     notifyListeners();
+  }
+
+  /// Update hydration adjustment (in percentage points)
+  void updateHydrationAdjustment(int value) {
+    // Only update if within safe range: -10% to +15%
+    if (value >= -10 && value <= 15) {
+      _hydrationAdjustment = value;
+      notifyListeners();
+    }
+    // Silently ignore out-of-range requests
   }
 
   /// Toggle between metric and imperial measurement systems
@@ -159,6 +176,7 @@ class CalculatorProvider extends ChangeNotifier {
         thicknessLevel: int.parse(_thicknessInput),
         provingTimeHours: int.parse(_provingTimeInput),
         numberOfPizzas: int.parse(_numberOfPizzasInput),
+        hydrationAdjustment: _hydrationAdjustment,
       );
 
       // Check for calculation warnings
@@ -201,6 +219,7 @@ class CalculatorProvider extends ChangeNotifier {
     _thicknessInput = AppConstants.defaultThicknessLevel.toString();
     _provingTimeInput = AppConstants.defaultProvingTimeHours.toString();
     _numberOfPizzasInput = AppConstants.defaultNumberOfPizzas.toString();
+    _hydrationAdjustment = 0;
     
     notifyListeners();
   }
@@ -280,6 +299,7 @@ class CalculatorProvider extends ChangeNotifier {
     _thicknessInput = parameters.thicknessLevel.value.toString();
     _provingTimeInput = parameters.provingTimeHours.hours.toString();
     _numberOfPizzasInput = parameters.numberOfPizzas.toString();
+    _hydrationAdjustment = parameters.hydrationAdjustment;
     
     // Clear any existing validation errors
     _validationErrors.clear();
@@ -300,6 +320,7 @@ class CalculatorProvider extends ChangeNotifier {
       await prefs.setString('default_thickness', _thicknessInput);
       await prefs.setString('default_proving_time', _provingTimeInput);
       await prefs.setString('default_number_of_pizzas', _numberOfPizzasInput);
+      await prefs.setInt('default_hydration_adjustment', _hydrationAdjustment);
       debugPrint('Default recipe settings saved');
     } catch (e) {
       debugPrint('Failed to save default settings: $e');
@@ -315,6 +336,7 @@ class CalculatorProvider extends ChangeNotifier {
       final defaultThickness = prefs.getString('default_thickness');
       final defaultProvingTime = prefs.getString('default_proving_time');
       final defaultNumberOfPizzas = prefs.getString('default_number_of_pizzas');
+      final defaultHydrationAdjustment = prefs.getInt('default_hydration_adjustment');
 
       bool hasDefaults = false;
 
@@ -332,6 +354,10 @@ class CalculatorProvider extends ChangeNotifier {
       }
       if (defaultNumberOfPizzas != null) {
         _numberOfPizzasInput = defaultNumberOfPizzas;
+        hasDefaults = true;
+      }
+      if (defaultHydrationAdjustment != null) {
+        _hydrationAdjustment = defaultHydrationAdjustment;
         hasDefaults = true;
       }
 

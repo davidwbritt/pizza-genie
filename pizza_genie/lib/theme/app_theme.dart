@@ -4,23 +4,27 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   /// Light theme configuration with Italian design
   static ThemeData get lightTheme {
-    // Italian flag colors - green as primary for sophistication
+    // Italian flag colors - sophisticated, muted tones for elegance
     const italianRed = Color(0xFFC8102E);
-    const italianGreen = Color(0xFF009246);
+    const italianGreen = Color(0xFF006B3D); // Deeper, more sophisticated green
     const warmCrustBrown = Color(0xFFF4E4B8); // Warm brown crust color from splash
     const creamyWhite = Color(0xFFF8F6F0);
+    const deepTextBrown = Color(0xFF3E2723); // Deep rich brown for all text
+    const mediumTextBrown = Color(0xFF5D4037); // Medium brown for secondary text
     
     final colorScheme = ColorScheme.light(
       primary: italianGreen,
       secondary: italianRed,
+      background: warmCrustBrown,
       surface: warmCrustBrown,
       surfaceVariant: creamyWhite,
       primaryContainer: italianGreen.withOpacity(0.1),
       secondaryContainer: italianRed.withOpacity(0.1),
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onSurface: const Color(0xFF2C1810),
-      onSurfaceVariant: const Color(0xFF5D4037),
+      onBackground: deepTextBrown,
+      onSurface: deepTextBrown,
+      onSurfaceVariant: mediumTextBrown,
       outline: const Color(0xFFBCAAA4),
       shadow: Colors.black26,
     );
@@ -29,61 +33,68 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       
+      // Explicitly override Material You dynamic theming
+      scaffoldBackgroundColor: warmCrustBrown,
+      canvasColor: warmCrustBrown,
+      
+      // Force override of dynamic theming on Android
+      extensions: const [],
+      
       // Premium typography with Italian elegance
       textTheme: GoogleFonts.interTextTheme().copyWith(
         // Headers use elegant serif for sophistication
         headlineLarge: GoogleFonts.playfairDisplay(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           letterSpacing: -0.5,
         ),
         headlineMedium: GoogleFonts.playfairDisplay(
           fontSize: 28,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           letterSpacing: -0.5,
         ),
         headlineSmall: GoogleFonts.playfairDisplay(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
         ),
         
         // Body text uses clean Inter for readability
         titleLarge: GoogleFonts.inter(
           fontSize: 22,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           letterSpacing: -0.2,
         ),
         titleMedium: GoogleFonts.inter(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
         ),
         titleSmall: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurfaceVariant,
+          color: mediumTextBrown,
         ),
         
         bodyLarge: GoogleFonts.inter(
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           height: 1.5,
         ),
         bodyMedium: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           height: 1.4,
         ),
         bodySmall: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: colorScheme.onSurfaceVariant,
+          color: mediumTextBrown,
           height: 1.4,
         ),
         
@@ -91,19 +102,19 @@ class AppTheme {
         labelLarge: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
           letterSpacing: 0.1,
         ),
         labelMedium: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: colorScheme.onSurfaceVariant,
+          color: mediumTextBrown,
           letterSpacing: 0.5,
         ),
         labelSmall: GoogleFonts.inter(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: colorScheme.onSurfaceVariant,
+          color: mediumTextBrown,
           letterSpacing: 0.5,
         ),
       ),
@@ -111,12 +122,12 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
+        backgroundColor: warmCrustBrown,
+        foregroundColor: deepTextBrown,
         titleTextStyle: GoogleFonts.playfairDisplay(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: deepTextBrown,
         ),
       ),
       
@@ -175,9 +186,9 @@ class AppTheme {
 
   /// Dark theme configuration with Italian design
   static ThemeData get darkTheme {
-    // Italian flag colors adapted for dark theme - green primary
+    // Italian flag colors adapted for dark theme - sophisticated greens
     const italianRedDark = Color(0xFFE53E3E);
-    const italianGreenDark = Color(0xFF38A169);
+    const italianGreenDark = Color(0xFF2D7A4A); // Deeper green for dark theme
     const darkCrustBrown = Color(0xFF8B6914); // Darker version of crust brown
     const darkSurfaceVariant = Color(0xFF2D2D2D);
     
@@ -199,6 +210,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      
+      // Explicitly override Material You dynamic theming
+      scaffoldBackgroundColor: darkCrustBrown,
+      canvasColor: darkCrustBrown,
       
       // Same typography system with dark theme colors
       textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
