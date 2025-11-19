@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../providers/calculator_provider.dart';
 import '../constants/constants.dart';
@@ -591,25 +592,52 @@ class CompactInputPanel extends StatelessWidget {
     _autoCalculateIfValid(provider);
     
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.receipt_long,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 18,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Your Recipe',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+      elevation: 3,
+      shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.surface,
+              Theme.of(context).colorScheme.surface.withOpacity(0.8),
+            ],
+          ),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.receipt_long,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 18,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Your Recipe',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 const Spacer(),
                 
                 // Quantity multiplier control
@@ -626,10 +654,10 @@ class CompactInputPanel extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                           ),
                         ),
                         child: Row(
@@ -750,6 +778,7 @@ class CompactInputPanel extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -767,12 +796,13 @@ class CompactInputPanel extends StatelessWidget {
   /// Build compact ingredient tile for live preview
   Widget _buildCompactIngredientTile(BuildContext context, IngredientMeasurement measurement) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          width: 1,
         ),
       ),
       child: Column(
