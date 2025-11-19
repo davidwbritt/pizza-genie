@@ -65,6 +65,8 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
           _stepKeys.removeRange(steps.length, _stepKeys.length);
         }
 
+        final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+        
         return Column(
           children: [
             // Fixed header with ingredients summary
@@ -75,11 +77,12 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
               child: _buildStepsList(context, steps),
             ),
             
-            // Step navigation
+            // Step navigation with integrated keep awake in landscape
             _buildStepNavigation(context, steps),
             
-            // Subtle keep awake toggle at bottom
-            _buildSubtleKeepAwakeToggle(context, provider),
+            // Keep awake toggle (only in portrait - integrated in landscape)
+            if (!isLandscape)
+              _buildSubtleKeepAwakeToggle(context, provider),
           ],
         );
       },
@@ -88,8 +91,10 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
 
   /// Build compact ingredients summary at top
   Widget _buildIngredientsHeader(BuildContext context, CalculatorProvider provider) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    
     return Container(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.all(isLandscape ? AppConstants.defaultPadding * 0.75 : AppConstants.defaultPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
         border: Border(
@@ -98,66 +103,34 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.list_alt,
-                color: Theme.of(context).colorScheme.primary,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Ingredients',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              
-              // Measurement system toggle
-              InkWell(
-                onTap: () => provider.toggleMeasurementSystem(),
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        provider.measurementSystem == MeasurementSystem.metric ? 'g/ml' : 'cups',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.swap_horiz,
-                        size: 12,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      child: isLandscape ? _buildLandscapeHeader(context, provider) : _buildPortraitHeader(context, provider),
+    );
+  }
+
+  /// Build landscape header with inline ingredients
+  Widget _buildLandscapeHeader(BuildContext context, CalculatorProvider provider) {
+    return Row(
+      children: [
+        Icon(
+          Icons.list_alt,
+          color: Theme.of(context).colorScheme.primary,
+          size: 16,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          'Ingredients:',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
           ),
-          const SizedBox(height: 8),
-          
-          // Compact ingredients list
-          Wrap(
-            spacing: 16,
-            runSpacing: 4,
+        ),
+        const SizedBox(width: 12),
+        
+        // Inline ingredients list
+        Expanded(
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 2,
             children: provider.currentMeasurements.map((measurement) {
               final displayText = provider.measurementSystem == MeasurementSystem.metric
                 ? _roundToGram(measurement.metricDisplay)
@@ -167,12 +140,128 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
                 '${_getIngredientEmoji(measurement.ingredientType)} $displayText',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
+                  fontSize: 11,
                 ),
               );
             }).toList(),
           ),
-        ],
-      ),
+        ),
+        
+        const SizedBox(width: 8),
+        // Compact measurement toggle
+        InkWell(
+          onTap: () => provider.toggleMeasurementSystem(),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  provider.measurementSystem == MeasurementSystem.metric ? 'g/ml' : 'cups',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Icon(
+                  Icons.swap_horiz,
+                  size: 10,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build portrait header with stacked layout
+  Widget _buildPortraitHeader(BuildContext context, CalculatorProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.list_alt,
+              color: Theme.of(context).colorScheme.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Ingredients',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+            
+            // Measurement system toggle
+            InkWell(
+              onTap: () => provider.toggleMeasurementSystem(),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      provider.measurementSystem == MeasurementSystem.metric ? 'g/ml' : 'cups',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.swap_horiz,
+                      size: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        
+        // Compact ingredients list
+        Wrap(
+          spacing: 16,
+          runSpacing: 4,
+          children: provider.currentMeasurements.map((measurement) {
+            final displayText = provider.measurementSystem == MeasurementSystem.metric
+              ? _roundToGram(measurement.metricDisplay)
+              : measurement.imperialDisplay;
+            
+            return Text(
+              '${_getIngredientEmoji(measurement.ingredientType)} $displayText',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -354,6 +443,8 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
                             ? Theme.of(context).colorScheme.onSurfaceVariant
                             : null,
                         ),
+                        maxLines: null, // Allow text wrapping
+                        overflow: TextOverflow.visible,
                       ),
                       
                       // Add timing hints for key steps
@@ -366,25 +457,31 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
                               color: Theme.of(context).colorScheme.primary,
                               fontStyle: FontStyle.italic,
                             ),
+                            maxLines: null,
+                            overflow: TextOverflow.visible,
                           ),
                         ),
                     ],
                   ),
                 ),
                 
-                // Current step indicator
+                // Current step indicator - more compact in landscape
                 if (isCurrent)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: MediaQuery.of(context).orientation == Orientation.landscape
+                      ? const EdgeInsets.symmetric(horizontal: 4, vertical: 2)
+                      : const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'CURRENT',
+                      MediaQuery.of(context).orientation == Orientation.landscape 
+                        ? 'NOW' 
+                        : 'CURRENT',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: 10,
+                        fontSize: MediaQuery.of(context).orientation == Orientation.landscape ? 8 : 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -408,8 +505,15 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
 
   /// Build step navigation at bottom
   Widget _buildStepNavigation(BuildContext context, List<String> steps) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    
     return Container(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.fromLTRB(
+        isLandscape ? AppConstants.defaultPadding * 0.5 : AppConstants.defaultPadding,
+        isLandscape ? AppConstants.defaultPadding * 0.5 : AppConstants.defaultPadding,
+        isLandscape ? AppConstants.defaultPadding * 0.5 : AppConstants.defaultPadding,
+        isLandscape ? 4 : AppConstants.defaultPadding, // Minimal bottom padding in landscape
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
@@ -419,62 +523,182 @@ class _CookingStepsPanelState extends State<CookingStepsPanel> {
         ),
       ),
       child: SafeArea(
-        child: Row(
-          children: [
-            // Previous step
-            TextButton.icon(
-              onPressed: _currentStep > 0 ? () {
-                setState(() {
-                  _currentStep--;
-                });
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _scrollToCurrentStep();
-                });
-              } : null,
-              icon: const Icon(Icons.arrow_back, size: 18),
-              label: const Text('Previous'),
-            ),
-            
-            const Spacer(),
-            
-            // Progress indicator
-            Text(
-              'Step ${_currentStep + 1} of ${steps.length}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            
-            const Spacer(),
-            
-            // Next step / Mark complete
-            TextButton.icon(
-              onPressed: _currentStep < steps.length - 1 ? () {
-                setState(() {
-                  _currentStep++;
-                });
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _scrollToCurrentStep();
-                });
-              } : () {
-                // All steps completed
-                _showCompletionDialog(context);
-              },
-              icon: Icon(
-                _currentStep < steps.length - 1 
-                  ? Icons.arrow_forward 
-                  : Icons.check_circle,
-                size: 18,
-              ),
-              label: Text(
-                _currentStep < steps.length - 1 
-                  ? 'Next' 
-                  : 'Done!',
-              ),
-            ),
-          ],
-        ),
+        child: isLandscape ? _buildLandscapeNavigation(context, steps) : _buildPortraitNavigation(context, steps),
       ),
+    );
+  }
+
+  /// Build landscape navigation with integrated keep awake
+  Widget _buildLandscapeNavigation(BuildContext context, List<String> steps) {
+    return Row(
+      children: [
+        // Keep awake toggle (left side in landscape)
+        Consumer<CalculatorProvider>(
+          builder: (context, provider, child) {
+            return InkWell(
+              onTap: () {
+                provider.toggleKeepAwake();
+                _handleKeepAwake(provider.keepAwake);
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      provider.keepAwake ? Icons.lightbulb : Icons.lightbulb_outline,
+                      color: provider.keepAwake
+                          ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+                          : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      size: 12,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      'Keep awake',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: provider.keepAwake
+                            ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                            : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        
+        const SizedBox(width: 12),
+        
+        // Previous step - minimal height
+        TextButton.icon(
+          onPressed: _currentStep > 0 ? () {
+            setState(() {
+              _currentStep--;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToCurrentStep();
+            });
+          } : null,
+          icon: const Icon(Icons.arrow_back, size: 14),
+          label: const Text('Prev', style: TextStyle(fontSize: 11)),
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(50, 24),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        
+        const Spacer(),
+        
+        // Progress indicator
+        Text(
+          'Step ${_currentStep + 1} of ${steps.length}',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
+        ),
+        
+        const Spacer(),
+        
+        // Next step / Mark complete - minimal height
+        TextButton.icon(
+          onPressed: _currentStep < steps.length - 1 ? () {
+            setState(() {
+              _currentStep++;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToCurrentStep();
+            });
+          } : () {
+            // All steps completed
+            _showCompletionDialog(context);
+          },
+          icon: Icon(
+            _currentStep < steps.length - 1 
+              ? Icons.arrow_forward 
+              : Icons.check_circle,
+            size: 14,
+          ),
+          label: Text(
+            _currentStep < steps.length - 1 ? 'Next' : 'Done!',
+            style: const TextStyle(fontSize: 11),
+          ),
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(50, 24),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build portrait navigation (original layout)
+  Widget _buildPortraitNavigation(BuildContext context, List<String> steps) {
+    return Row(
+      children: [
+        // Previous step
+        TextButton.icon(
+          onPressed: _currentStep > 0 ? () {
+            setState(() {
+              _currentStep--;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToCurrentStep();
+            });
+          } : null,
+          icon: const Icon(Icons.arrow_back, size: 18),
+          label: const Text('Previous'),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+        ),
+        
+        const Spacer(),
+        
+        // Progress indicator
+        Text(
+          'Step ${_currentStep + 1} of ${steps.length}',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        
+        const Spacer(),
+        
+        // Next step / Mark complete
+        TextButton.icon(
+          onPressed: _currentStep < steps.length - 1 ? () {
+            setState(() {
+              _currentStep++;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToCurrentStep();
+            });
+          } : () {
+            // All steps completed
+            _showCompletionDialog(context);
+          },
+          icon: Icon(
+            _currentStep < steps.length - 1 
+              ? Icons.arrow_forward 
+              : Icons.check_circle,
+            size: 18,
+          ),
+          label: Text(
+            _currentStep < steps.length - 1 
+              ? 'Next' 
+              : 'Done!',
+          ),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+        ),
+      ],
     );
   }
 

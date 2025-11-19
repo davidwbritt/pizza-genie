@@ -64,17 +64,15 @@ class CompactInputPanel extends StatelessWidget {
         ),
         const SizedBox(height: AppConstants.defaultPadding * 0.75),
         
-        // Row 2: Proving time and Recipe side by side
+        // Row 2: Proving time and Recipe side by side (equal width)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 2,
               child: _buildProvingTimeSlider(context, provider),
             ),
             const SizedBox(width: AppConstants.defaultPadding),
             Expanded(
-              flex: 3,
               child: _buildLiveIngredientsPreview(context, provider),
             ),
           ],
